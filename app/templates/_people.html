@@ -1,0 +1,11 @@
+<tr valign="top">
+	<td>{{ person.id }}</td>
+	<td>{{ person.name }}</td>
+	<td>{{ person.cpf }}</td>
+	{% if current_user.is_authenticated %}
+	<td><a href="{{ url_for('main.person', person_id=person.id) }}"><button type="button" class="btn btn-primary">Edit</button></a></td>
+	<td><a href="{{ url_for('main.delete_person', person_id=person.id) }}"><button type="button" class="btn btn-danger">Delete</button></a></td>
+	{% else %}
+	<td><a href="{{ url_for('main.person', person_id=person.id) }}"><button type="button">View</button></a></td>
+	{% endif %}
+</tr>

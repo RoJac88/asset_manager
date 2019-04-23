@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+	{% if person != None %}
+	<div class="container">
+		<h1>Person Details</h1>
+		<table class="table table-hover">
+			<tr>
+				<th>Attribute</th>
+				<th>Value</th>
+			</tr>
+			<tr>
+				<td>ID</td>
+				<td>{{ person.id }}</td>
+			</tr>
+			<tr>
+				<td>Name</td>
+				<td>{{ person.name }}</td>
+			</tr>
+			<tr>
+				<td>CPF</td>
+				<td>{{ person.cpf }}</td>
+			</tr>
+			<tr>
+				<td>RG</td>
+				<td>{{ person.rg }}</td>
+			</tr>
+			<tr>
+				<td>email</td>
+				<td>{{ person.email }}</td>
+			</tr>
+			<tr>
+				<td>Created by: </td>
+				<td>{{ person.user_id }}: {{ User.query.get(person.user_id).username }}</td>
+			</tr>
+			<tr>
+				<td>Creation time: </td>
+				<td>{{ moment(person.timestamp).format('LLLL') }}</td>
+			</tr>
+			<tr>
+				<td>Last edit by: </td>
+				<td>{{ person.last_editor }}: {{ User.query.get(person.last_editor).username }}</td>
+			</tr>
+			<tr>
+				<td>Last edit time: </td>
+				<td>{{ moment(person.last_edit_time).fromNow() }}</td>
+			</tr>
+		</table>
+	</div>
+	{% endif %}
+{% endblock %}
