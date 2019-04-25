@@ -1,7 +1,8 @@
 <tr valign="top">
 	<td>{{ person.id }}</td>
+	<td>{{ person.type.upper() }}</td>
 	<td>{{ person.name }}</td>
-	<td>{{ person.cpf }}</td>
+	<td>{{ person.cpf if person.type == 'natural' }}{{ person.cnpj if person.type == 'legal' }}</td>
 	{% if current_user.is_authenticated %}
 	<td><a href="{{ url_for('main.person', person_id=person.id) }}"><button type="button" class="btn btn-primary">Edit</button></a></td>
 	<td><a href="{{ url_for('main.delete_person', person_id=person.id) }}"><button type="button" class="btn btn-danger">Delete</button></a></td>

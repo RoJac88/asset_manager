@@ -19,30 +19,43 @@
 					<td>{{ form.name.label }}</td>
 					<td>{{ form.name(size=64) }}</td>
 					{% for error in form.name.errors %}
-		            <span style="color: red;">[{{ error }}]</span>
-		            {% endfor %}
+		      <span style="color: red;">[{{ error }}]</span>
+		      {% endfor %}
 				</tr>
 				<tr>
-					<td>CPF</td>
-					<td>{{ person.cpf }}</td>
+					{% if person.type == 'natural' %}
+						<td>CPF</td>
+						<td>{{ person.cpf }}</td>
+					{% elif person.type == 'legal' %}
+						<td>CNPJ</td>
+						<td>{{ person.cnpj }}</td>
+					{% endif %}
 				</tr>
 				<tr>
-					<td>{{ form.rg.label }}</td>
-					<td>{{ form.rg(size=9) }}</td>
-					{% for error in form.rg.errors %}
-		            <span style="color: red;">[{{ error }}]</span>
-		            {% endfor %}
+					{% if person.type == 'natural' %}
+						<td>{{ form.rg.label }}</td>
+						<td>{{ form.rg(size=11) }}</td>
+						{% for error in form.rg.errors %}
+			      <span style="color: red;">[{{ error }}]</span>
+			      {% endfor %}
+					{% elif person.type == 'legal' %}
+						<td>{{ form.code.label }}</td>
+						<td>{{ form.code(size=11) }}</td>
+						{% for error in form.code.errors %}
+						<span style="color: red;">[{{ error }}]</span>
+						{% endfor %}
+					{% endif %}
 				</tr>
 				<tr>
 					<td>{{ form.email.label }}</td>
 					<td>{{ form.email(size=32) }}</td>
 					{% for error in form.email.errors %}
-		            <span style="color: red;">[{{ error }}]</span>
-		            {% endfor %}
+		      <span style="color: red;">[{{ error }}]</span>
+		      {% endfor %}
 				</tr>
 				<tr>
 					<td>Created by: </td>
-					<td>{{ person.user_id }}: {{ User.query.get(person.user_id).username }}</td>
+					<td>{{ person.user_id }}: {{ User.query.get(person.user_id).username if person.user_id != None }}</td>
 				</tr>
 				<tr>
 					<td>Creation time: </td>

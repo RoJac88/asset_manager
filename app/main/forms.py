@@ -1,10 +1,10 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Optional, Email
-from app.models import Person
+from app.models import Person, NaturalPerson
 from flask import request
 
-class EditPersonForm(FlaskForm):
+class EditNaturalPersonForm(FlaskForm):
     name = StringField('Name')
     rg = StringField('RG', validators=[Optional()])
     email = StringField('Email', validators=[Optional(), Email()])
@@ -13,7 +13,32 @@ class EditPersonForm(FlaskForm):
     def validate_rg(self, rg):
         if len(rg.data) > 11: raise ValidationError('Invalid RG')
 
-class AddPersonForm(FlaskForm):
+class EditLegalPersonForm(FlaskForm):
+    name = StringField('Name')
+    code = StringField('Code', validators=[Optional()])
+    email = StringField('Email', validators=[Optional(), Email()])
+    submit = SubmitField('Update')
+
+    def validate_cnpj(self, cnpj):
+        if not cnpj.data.isdigit():
+            raise ValidationError('CNPJ must contain only digits')
+        if len(cnpj.data) != 20:
+            raise ValidationError('Invalid CNPJ number')
+
+class AddLegalPersonFrom(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    cnpj = StringField('CNPJ', validators=[DataRequired()])
+    code = StringField('Code', validators=[Optional()])
+    email = StringField('Email', validators=[Optional(), Email()])
+    submit = SubmitField('Insert')
+
+    def validate_cnpj(self, cnpj):
+        if not cnpj.data.isdigit():
+            raise ValidationError('CNPJ must contain only digits')
+        if len(cnpj.data) != 20:
+            raise ValidationError('Invalid CNPJ number')
+
+class AddNaturalPersonForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     cpf = StringField('CPF', validators=[DataRequired()])
     rg = StringField('RG', validators=[Optional()])
@@ -28,7 +53,7 @@ class AddPersonForm(FlaskForm):
             raise ValidationError('CPF must contain only digits')
         if len(cpf.data) != 11:
             raise ValidationError('Invalid CPF number')
-        person = Person.query.filter_by(cpf=cpf.data).first()
+        person = NaturalPerson.query.filter_by(cpf=cpf.data).first()
         if person is not None:
             raise ValidationError('This CPF is already in the database')
         numbers = [int(digit) for digit in cpf.data if digit.isdigit()]

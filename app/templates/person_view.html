@@ -31,7 +31,7 @@
 			</tr>
 			<tr>
 				<td>Created by: </td>
-				<td>{{ person.user_id }}: {{ User.query.get(person.user_id).username }}</td>
+				<td>{{ person.user_id }}: {{ User.query.get(person.user_id).username if person.user_id != None }}</td>
 			</tr>
 			<tr>
 				<td>Creation time: </td>
