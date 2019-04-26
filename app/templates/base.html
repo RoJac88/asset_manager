@@ -5,6 +5,11 @@
     {{ moment.include_moment() }}
 {% endblock %}
 
+{% block styles %}
+{{super()}}
+<link rel="stylesheet" href="{{ url_for('main.static', filename='stylesheet.css') }}">
+{% endblock %}
+
 {% block title %}People Database{% endblock %}
 {% block navbar %}
     <nav class="navbar navbar-default">
@@ -34,6 +39,7 @@
             </div>
         </div>
     </nav>
+
 {% endblock %}
 
 {% block content %}

@@ -53,7 +53,7 @@ class NaturalPerson(Person):
 class LegalPerson(Person):
     id = db.Column(db.Integer, db.ForeignKey('person.id'), primary_key=True)
     cnpj = db.Column(db.String(20), index=True, unique=True)
-    code = db.Column(db.String(64))
+    code = db.Column(db.Integer, db.ForeignKey('legal_codes.id'))
 
     def __repr__(self):
         return '<Legal Person {}, {}>'.format(self.cnpj, self.name)
@@ -62,6 +62,16 @@ class LegalPerson(Person):
         'polymorphic_identity':'legal',
     }
 
+class LegalPCodes(db.Model):
+    __tablename__ = 'legal_codes'
+    id = db.Column(db.Integer, primary_key=True)
+    code_digits = db.Column(db.String(5), index=True, unique=True)
+    description = db.Column(db.String(64))
+    code_string = db.Column(db.String(6))
+    legal_persons = db.relationship('LegalPerson', backref='category', lazy='dynamic', foreign_keys='LegalPerson.code')
+
+    def __repr__(self):
+        return '{} : {}'.format(self.code_string, self.description)
 
 class Lawsuit(db.Model):
     id = db.Column(db.Integer, primary_key=True)

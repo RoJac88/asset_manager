@@ -10,6 +10,10 @@
 				<th>Value</th>
 			</tr>
 			<tr>
+				<td>Type</td>
+				<td>{{ person.type }}</td>
+			</tr>
+			<tr>
 				<td>ID</td>
 				<td>{{ person.id }}</td>
 			</tr>
@@ -18,12 +22,12 @@
 				<td>{{ person.name }}</td>
 			</tr>
 			<tr>
-				<td>CPF</td>
-				<td>{{ person.cpf }}</td>
+				<td>CNPJ</td>
+				<td>{{ person.cnpj }}</td>
 			</tr>
 			<tr>
-				<td>RG</td>
-				<td>{{ person.rg }}</td>
+				<td>Code (Natureza Jurídica)</td>
+				<td>{{ person.code }}</td>
 			</tr>
 			<tr>
 				<td>email</td>
@@ -31,7 +35,7 @@
 			</tr>
 			<tr>
 				<td>Created by: </td>
-				<td>{{ person.user_id }}: {{ User.query.get(person.user_id).username if person.user_id != None }}</td>
+				<td>{{ person.user_id }}: {{ creator }}</td>
 			</tr>
 			<tr>
 				<td>Creation time: </td>
@@ -39,7 +43,7 @@
 			</tr>
 			<tr>
 				<td>Last edit by: </td>
-				<td>{{ person.last_editor }}: {{ User.query.get(person.last_editor).username }}</td>
+				<td>{{ person.last_editor }}: {{ editor }}</td>
 			</tr>
 			<tr>
 				<td>Last edit time: </td>

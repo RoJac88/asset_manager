@@ -2,9 +2,10 @@ from flask import render_template, flash, redirect, url_for, request, current_ap
 from app import db
 from app.main.forms import AddLegalPersonFrom, AddNaturalPersonForm, EditNaturalPersonForm, EditLegalPersonForm
 from flask_login import current_user, login_required
-from app.models import User, Person, NaturalPerson, LegalPerson
+from app.models import User, Person, NaturalPerson, LegalPerson, LegalPCodes
 from datetime import datetime
 from app.main import bp
+import csv
 
 @bp.route('/')
 @bp.route('/index')
@@ -15,33 +16,33 @@ def index():
 @bp.route('/add_person', methods=['GET', 'POST'])
 @login_required
 def add_person():
-    form_natural = AddNaturalPersonForm()
-    form_legal = AddLegalPersonFrom()
-    if form_natural.validate_on_submit():
+    form1 = AddNaturalPersonForm()
+    form2 = AddLegalPersonFrom()
+    if form1.validate_on_submit() and form1.submit.data:
         user_id = current_user.id
-        name = form_natural.name.data.upper()
-        cpf = form_natural.cpf.data
-        rg = form_natural.rg.data
-        email = form_natural.email.data
+        name = form1.name.data.upper()
+        cpf = form1.cpf.data
+        rg = form1.rg.data
+        email = form1.email.data
         new_person = NaturalPerson(name=name,cpf=cpf,rg=rg,user_id=user_id,
             email=email,last_editor=user_id)
         db.session.add(new_person)
         db.session.commit()
         flash('Added {} to the database!'.format(name))
         return redirect(url_for('main.index'))
-    if form_legal.validate_on_submit():
+    if form2.validate_on_submit() and form2.submit.data:
         user_id = current_user.id
-        name = form_legal.name.data.upper()
-        cnpj = form_legal.cnpj.data
-        code = form_legal.code.data
-        email = form_legal.email.data
+        name = form2.name.data.upper()
+        cnpj = form2.cnpj.data
+        code = form2.code.data.id
+        email = form2.email.data
         new_person = LegalPerson(name=name,cnpj=cnpj,code=code,user_id=user_id,
             email=email,last_editor=user_id)
         db.session.add(new_person)
         db.session.commit()
         flash('Added {} to the database!'.format(name))
         return redirect(url_for('main.index'))
-    return render_template('add_person.html', form=(form_natural, form_legal))
+    return render_template('add_person.html', form1=form1, form2=form2)
 
 @bp.route('/people')
 def people():
@@ -54,36 +55,42 @@ def people():
 @bp.route('/person/<person_id>', methods=['GET', 'POST'])
 def person(person_id):
     current_person = Person.query.get(person_id)
-    print(current_person.type)
+    creator = User.query.get(current_person.user_id).username
+    editor = User.query.get(current_person.last_editor).username
+    if not current_user.is_authenticated and current_person.type == 'natural':
+        return render_template('natural_person_view.html', person=current_person, creator=creator, editor=editor)
+    if not current_user.is_authenticated and current_person.type == 'legal':
+        return render_template('legal_person_view.html', person=current_person, creator=creator, editor=editor)
     forms = {'legal': EditLegalPersonForm(), 'natural': EditNaturalPersonForm()}
     form = forms[current_person.type]
-    if current_user.is_authenticated and current_person.type == 'natural':
-        if form.validate_on_submit():
-            current_person.name = form.name.data.upper()
-            current_person.rg = form.rg.data
-            current_person.email = form.email.data
-            current_person.last_editor = current_user.id
-            current_person.last_edit_time = datetime.utcnow()
-            db.session.commit()
-            flash('Your changes have been saved')
-            return redirect(url_for('main.people'))
-        elif current_person.type == 'legal':
-            if form.validate_on_submit():
-                current_person.name = form.name.data.upper()
-                current_person.code = form.code.data
-                current_person.email = form.email.data
-                current_person.last_editor = current_user.id
-                current_person.last_edit_time = datetime.utcnow()
-                db.session.commit()
-                flash('Your changes have been saved')
-                return redirect(url_for('main.people'))
-        elif request.method == 'GET':
-            form.name.data = current_person.name
-            form.rg.data = current_person.rg
-            form.email.data = current_person.email
-        return render_template('person_edit.html', person=current_person, form=form, User=User)
-    else:
-        return render_template('person_view.html', person=current_person, User=User)
+    if form.validate_on_submit() and current_person.type == 'natural':
+        current_person.name = form.name.data.upper()
+        current_person.rg = form.rg.data
+        current_person.email = form.email.data
+        current_person.last_editor = current_user
+        current_person.last_edit_time = datetime.utcnow()
+        db.session.commit()
+        flash('Your changes have been saved')
+        return redirect(url_for('main.people'))
+    elif form.validate_on_submit() and current_person.type == 'legal':
+        current_person.name = form.name.data.upper()
+        current_person.code = form.code.data.id
+        current_person.email = form.email.data
+        current_person.last_editor = current_user.id
+        current_person.last_edit_time = datetime.utcnow()
+        db.session.commit()
+        flash('Your changes have been saved')
+        return redirect(url_for('main.people'))
+    elif request.method == 'GET' and current_person.type == 'natural':
+        form.name.data = current_person.name
+        form.rg.data = current_person.rg
+        form.email.data = current_person.email
+        return render_template('natural_person_edit.html', person=current_person, form=form, creator=creator, editor=editor)
+    elif current_person.type == 'legal':
+        form.name.data = current_person.name
+        form.code.data = current_person.category
+        form.email.data = current_person.email
+        return render_template('legal_person_edit.html', person=current_person, form=form, creator=creator, editor=editor)
 
 @bp.route('/person/<person_id>/delete', methods=['GET'])
 @login_required

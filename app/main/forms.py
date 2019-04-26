@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms import StringField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Optional, Email
-from app.models import Person, NaturalPerson
+from app.models import Person, NaturalPerson, LegalPCodes
 from flask import request
 
 class EditNaturalPersonForm(FlaskForm):
@@ -15,27 +16,29 @@ class EditNaturalPersonForm(FlaskForm):
 
 class EditLegalPersonForm(FlaskForm):
     name = StringField('Name')
-    code = StringField('Code', validators=[Optional()])
+    code = QuerySelectField('Code',
+        query_factory=lambda: LegalPCodes.query, allow_blank=False)
     email = StringField('Email', validators=[Optional(), Email()])
     submit = SubmitField('Update')
 
     def validate_cnpj(self, cnpj):
         if not cnpj.data.isdigit():
             raise ValidationError('CNPJ must contain only digits')
-        if len(cnpj.data) != 20:
+        if len(cnpj.data) != 14:
             raise ValidationError('Invalid CNPJ number')
 
 class AddLegalPersonFrom(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     cnpj = StringField('CNPJ', validators=[DataRequired()])
-    code = StringField('Code', validators=[Optional()])
+    code = QuerySelectField('Code',
+        query_factory=lambda: LegalPCodes.query, allow_blank=False)
     email = StringField('Email', validators=[Optional(), Email()])
     submit = SubmitField('Insert')
 
     def validate_cnpj(self, cnpj):
         if not cnpj.data.isdigit():
             raise ValidationError('CNPJ must contain only digits')
-        if len(cnpj.data) != 20:
+        if len(cnpj.data) != 14:
             raise ValidationError('Invalid CNPJ number')
 
 class AddNaturalPersonForm(FlaskForm):

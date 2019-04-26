@@ -2,10 +2,33 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-	<h1>Upload CSV</h1>
-	<div class="row">
-        <div class="col-sm-4" style="background-color:lavender">
-            {{ wtf.quick_form(form, button_map={'submit': 'primary'}) }}
-        </div>
+  <div class="container">
+    <h2>CSV Upload</h2>
+
+    <ul class="nav nav-tabs">
+      <li class="{{ 'active' if 'cnpj' not in dict(request.form) }}"><a data-toggle="tab" href="#natural">Natural Person</a></li>
+      <li class="{{ 'active' if 'cnpj' in dict(request.form) }}"><a data-toggle="tab" href="#legal">Legal Person</a></li>
+    </ul>
+
+    <div class="tab-content">
+      <div id="natural" class="tab-pane fade {{'in active' if 'cnpj' not in dict(request.form)}}">
+          <h3>Insert Natural Persons</h3>
+          <div class="row">
+              <div class="col-sm-4" style="background-color:lavender">
+                  {{ wtf.quick_form(form1) }}
+              </div>
+          </div>
+      </div>
+
+      <div id="legal" class="tab-pane fade {{'in active' if 'cnpj' in dict(request.form)}}">
+          <h3>Insert Legal Persons</h3>
+          <div class="row">
+              <div class="col-sm-4" style="background-color:cornsilk">
+                  {{ wtf.quick_form(form2) }}
+              </div>
+          </div>
+      </div>
+
     </div>
+  </div>
 {% endblock %}

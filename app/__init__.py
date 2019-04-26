@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
@@ -7,7 +9,6 @@ import logging
 from logging.handlers import RotatingFileHandler
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
-import os
 
 db = SQLAlchemy()
 migrate = Migrate()
