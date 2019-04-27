@@ -14,6 +14,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     persons = db.relationship('Person', backref='creator', lazy='dynamic', foreign_keys='Person.user_id')
     persons_edited = db.relationship('Person', backref='editor', lazy='dynamic', foreign_keys='Person.last_editor')
+    templates_added = db.relationship('TemplateDocx', backref='author', lazy='dynamic', foreign_keys='TemplateDocx.user_id')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -78,18 +79,22 @@ class LegalPCodes(db.Model):
         return '{} : {}'.format(self.code_string, self.description)
 
 class TemplateDocx(db.Model):
+    __tablename__ = 'template_docx'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(24))
     description = db.Column(db.String(128))
     file_path = db.Column(db.String(128))
-    fields = None
-    user_id = None
+    file_size = db.Column(db.Integer)
+    fields = db.relationship('MergeField', backref='document', lazy='dynamic', foreign_keys='MergeField.template')
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    latest_use = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    docs_generated = db.Column(db.Integer)
 
 class MergeField(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     label = db.Column(db.String(24))
-    template = None
+    template = db.Column(db.Integer, db.ForeignKey('template_docx.id'))
 
 
 class Lawsuit(db.Model):
