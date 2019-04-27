@@ -3,14 +3,18 @@
 {% block app_content %}
 {% if current_user.is_authenticated %}
 <div>
-	<a href="{{ url_for('main.add_person') }}"><button type="button">Insert Person</button></a>
-	<a href="{{ url_for('csv.upload_csv') }}"><button type="button">Import CSV</button></a>
+	<a href="{{ url_for('main.add_person') }}"><button type="button" class="btn btn-default btn-sm">
+          <span class="glyphicon glyphicon-plus"></span> Insert Person
+        </button></a>
+	<a href="{{ url_for('csv.upload_csv') }}"><button type="button" class="btn btn-default btn-sm">
+          <span class="glyphicon glyphicon-open-file"></span> Import CSV
+        </button></a>
 </div>
 <br>
 {% endif %}
 {% if people != [] %}
 <div class="container">
-	<table class="table table-hover">
+	<table class="table table-striped table-hover table-condensed">
 		<tr>
 			<th>ID</th>
 			<th>Type</th>
