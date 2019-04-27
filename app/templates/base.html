@@ -7,7 +7,12 @@
 
 {% block styles %}
 {{super()}}
-<link rel="stylesheet" href="{{ url_for('main.static', filename='stylesheet.css') }}">
+<style>
+body {
+  background-image: url("{{ url_for('static', filename='bg.png') }}");
+  background-repeat: repeat;
+  }
+</style>
 {% endblock %}
 
 {% block title %}People Database{% endblock %}

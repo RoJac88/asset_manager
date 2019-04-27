@@ -55,12 +55,12 @@ def people():
 @bp.route('/person/<person_id>', methods=['GET', 'POST'])
 def person(person_id):
     current_person = Person.query.get(person_id)
-    creator = User.query.get(current_person.user_id).username
-    editor = User.query.get(current_person.last_editor).username
     if not current_user.is_authenticated and current_person.type == 'natural':
-        return render_template('natural_person_view.html', person=current_person, creator=creator, editor=editor)
+        return render_template('natural_person_view.html', person=current_person, creator=current_person.creator.username,
+            editor=current_person.editor.username)
     if not current_user.is_authenticated and current_person.type == 'legal':
-        return render_template('legal_person_view.html', person=current_person, creator=creator, editor=editor)
+        return render_template('legal_person_view.html', person=current_person, creator=current_person.creator.username,
+            editor=current_person.editor.username)
     forms = {'legal': EditLegalPersonForm(), 'natural': EditNaturalPersonForm()}
     form = forms[current_person.type]
     if form.validate_on_submit() and current_person.type == 'natural':
@@ -85,12 +85,14 @@ def person(person_id):
         form.name.data = current_person.name
         form.rg.data = current_person.rg
         form.email.data = current_person.email
-        return render_template('natural_person_edit.html', person=current_person, form=form, creator=creator, editor=editor)
+        return render_template('natural_person_edit.html', person=current_person, form=form, creator=current_person.creator.username,
+            editor=current_person.editor.username)
     elif current_person.type == 'legal':
         form.name.data = current_person.name
         form.code.data = current_person.category
         form.email.data = current_person.email
-        return render_template('legal_person_edit.html', person=current_person, form=form, creator=creator, editor=editor)
+        return render_template('legal_person_edit.html', person=current_person, form=form, creator=current_person.creator.username,
+            editor=current_person.editor.username)
 
 @bp.route('/person/<person_id>/delete', methods=['GET'])
 @login_required

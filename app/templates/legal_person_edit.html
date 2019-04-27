@@ -20,7 +20,7 @@
 				</tr>
 				<tr>
 					<td>CNPJ</td>
-					<td>{{ person.cnpj }}</td>
+					<td>{{ person.cnpj[:2]+'.'+person.cnpj[2:5]+'.'+person.cnpj[5:8]+'/'+person.cnpj[8:12]+'-'+person.cnpj[12:] }}</td>
 				</tr>
 				<tr>
 					<td>Created by: </td>

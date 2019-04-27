@@ -23,7 +23,7 @@
 				</tr>
 				<tr>
 					<td>CPF</td>
-					<td>{{ person.cpf }}</td>
+					<td>{{ person.cpf[:3]+'.'+person.cpf[3:6]+'.'+person.cpf[6:9]+'-'+person.cpf[9:] }}</td>
 				</tr>
 				<tr>
 					<td>RG</td>
