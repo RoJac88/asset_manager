@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request, current_app
 from app import db
-from app.main.forms import AddLegalPersonFrom, AddNaturalPersonForm, EditNaturalPersonForm, EditLegalPersonForm
+from app.main.forms import AddLegalPersonFrom, AddNaturalPersonForm, EditNaturalPersonForm, EditLegalPersonForm, AddDocx
 from flask_login import current_user, login_required
 from app.models import User, Person, NaturalPerson, LegalPerson, LegalPCodes
 from datetime import datetime
@@ -106,3 +106,14 @@ def delete_person(person_id):
     db.session.commit()
     flash('Record deleted: {}'.format(_p_repr))
     return redirect(url_for('main.people'))
+
+@bp.route('/mailmerge', methods=['GET'])
+@login_required
+def mailmerge():
+    return render_template('mailmerge.html')
+
+@bp.route('/add_template', methods=['GET'])
+@login_required
+def add_template():
+    form = AddDocx()
+    return render_template('add_docx.html', form=form)

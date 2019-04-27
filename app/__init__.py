@@ -15,7 +15,7 @@ migrate = Migrate()
 bootstrap = Bootstrap()
 moment = Moment()
 login = LoginManager()
-login.login_view = 'login'
+login.login_view = 'auth.login'
 
 def create_app(config_class=Config):
     app = Flask(__name__)

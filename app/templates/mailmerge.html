@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+{% if current_user.is_authenticated %}
+<div>
+	<a href="{{ url_for('main.add_template') }}"><button type="button" class="btn btn-primary">
+          <span class="glyphicon glyphicon-plus"></span> New Template
+        </button></a>
+</div>
+<br>
+{% endif %}
+<div class="panel panel-default">
+	<div class="panel-heading text-center"><h4>MailMerge Templates</h4></div>
+	<div class="panel-body">
+  </div>
+</div>
+{% endblock %}

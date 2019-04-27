@@ -4,6 +4,7 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Optional, Email
 from app.models import Person, NaturalPerson, LegalPCodes
 from flask import request
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 
 class EditNaturalPersonForm(FlaskForm):
     name = StringField('Name')
@@ -70,3 +71,12 @@ class AddNaturalPersonForm(FlaskForm):
         expected_digit = (sum_of_products * 10 % 11) % 10
         if numbers[10] != expected_digit:
             raise ValidationError('Invalid CPF number')
+
+class AddDocx(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    description = StringField('Description', validators=[Optional()])
+    file = FileField('docx: ', validators=[
+        FileRequired(),
+        FileAllowed(['docx'], 'docx flies only')
+    ])
+    submit = SubmitField('Upload')

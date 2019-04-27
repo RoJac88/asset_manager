@@ -3,6 +3,10 @@ from datetime import datetime
 from app import db, login
 from flask_login import UserMixin
 
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
@@ -73,13 +77,24 @@ class LegalPCodes(db.Model):
     def __repr__(self):
         return '{} : {}'.format(self.code_string, self.description)
 
+class TemplateDocx(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(24))
+    description = db.Column(db.String(128))
+    file_path = db.Column(db.String(128))
+    fields = None
+    user_id = None
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
+class MergeField(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    label = db.Column(db.String(24))
+    template = None
+
+
 class Lawsuit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.String(20), index=True, unique=True)
     plaintiff = db.Column(db.Integer, db.ForeignKey('person.id'))
     defendant = db.Column(db.Integer, db.ForeignKey('person.id'))
     val = db.Column(db.Integer, index=True) # valor da causa
-
-@login.user_loader
-def load_user(id):
-    return User.query.get(int(id))
