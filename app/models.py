@@ -48,7 +48,7 @@ class NaturalPerson(Person):
     rg = db.Column(db.String(11))
 
     def __repr__(self):
-        return '<Natural Person {}, {}>'.format(self.cpf, self.name)
+        return '{}, CPF: {}'.format(self.name, self.cpf)
 
     __mapper_args__ = {
         'polymorphic_identity':'natural',
@@ -61,7 +61,7 @@ class LegalPerson(Person):
     code = db.Column(db.Integer, db.ForeignKey('legal_codes.id'))
 
     def __repr__(self):
-        return '<Legal Person {}, {}>'.format(self.cnpj, self.name)
+        return '{}, CNPJ: {}'.format(self.name, self.cnpj)
 
     __mapper_args__ = {
         'polymorphic_identity':'legal',
@@ -85,7 +85,7 @@ class TemplateDocx(db.Model):
     description = db.Column(db.String(128))
     file_path = db.Column(db.String(128))
     file_size = db.Column(db.Integer)
-    fields = db.relationship('MergeField', backref='document', lazy='dynamic', foreign_keys='MergeField.template')
+    fields = db.relationship('MergeField', backref='document', lazy='select', foreign_keys='MergeField.template')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     latest_use = db.Column(db.DateTime, index=True, default=datetime.utcnow)
