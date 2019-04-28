@@ -8,4 +8,5 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ITEMS_PER_PAGE = 25
     CSV_FOLDER = 'app/csv/'
-    MAX_CONTENT_LENGTH = 8 * 1024 * 1024 # 8 megabytes 
+    DOCX_FOLDER = 'app/main/docx/'
+    MAX_CONTENT_LENGTH = 8 * 1024 * 1024 # 8 megabytes

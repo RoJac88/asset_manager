@@ -14,6 +14,7 @@ flask-moment = "*"
 flask-wtf = "*"
 pbr = "*"
 flask-bootstrap = "*"
+docx-mailmerge = "*"
 
 [requires]
 python_version = "3.7"

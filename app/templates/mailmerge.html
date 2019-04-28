@@ -12,6 +12,9 @@
 <div class="panel panel-default">
 	<div class="panel-heading text-center"><h4>MailMerge Templates</h4></div>
 	<div class="panel-body">
+		{% for template in templates %}
+		{% include '_template.html' %}
+		{% endfor %}
   </div>
 </div>
 {% endblock %}

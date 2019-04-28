@@ -7,10 +7,6 @@ from app.csv.forms import NaturalPersonUploadForm, LegalPersonUploadForm
 from app.models import NaturalPerson, LegalPerson, LegalPCodes
 from werkzeug.utils import secure_filename
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 @bp.route('/upload_csv', methods=['GET', 'POST'])
 @login_required
 def upload_csv():

@@ -1,7 +1,7 @@
 import os
 import csv
 from app import create_app, db
-from app.models import User, Person, NaturalPerson, LegalPerson, Lawsuit, LegalPCodes
+from app.models import User, Person, NaturalPerson, LegalPerson, Lawsuit, LegalPCodes, TemplateDocx, MergeField
 
 app = create_app()
 
@@ -22,7 +22,7 @@ def populate_legal_codes():
         new_code = LegalPCodes(code_string=key, description=val)
         code_digits = key.replace('-','').strip()
         if code_digits.isdigit():
-            new_code.code_digits = code_digits 
+            new_code.code_digits = code_digits
         if LegalPCodes.query.filter_by(code_digits=code_digits).first() == None:
             db.session.add(new_code)
             db.session.commit()
@@ -32,7 +32,7 @@ def populate_legal_codes():
 
 def clear_legal_codes():
     codes = LegalPCodes.query.all()
-    if codes != None:
+    if codes != []:
         for code in codes:
             db.session.delete(code)
         db.session.commit()
@@ -48,9 +48,33 @@ def print_codes():
     else:
         print('legal_codes table is already empty')
 
+def clear_templates():
+    temps = TemplateDocx.query.all()
+    if temps != []:
+        for temp in temps:
+            print(temp.fields)
+            db.session.delete(temp)
+        db.session.commit()
+        print('template_docx table clear')
+    else:
+        print('template_docx table is already empty')
+    fields = MergeField.query.all()
+    if fields != []:
+        for field in fields:
+            print(temp.field.label)
+            db.session.delete(temp)
+        db.session.commit()
+        print('merge_field table clear')
+    else:
+        print('merge_field table is already empty')
+
+def ct():
+    return clear_templates()
+
 @app.shell_context_processor
 def make_shell_context():
     return {'db': db, 'User': User, 'Person': Person, 'NaturalPerson': NaturalPerson,
         'LegalPerson': LegalPerson, 'Lawsuit': Lawsuit, 'LegalPCodes': LegalPCodes,
+        'TemplateDocx': TemplateDocx, 'MergeField': MergeField,
         'populate_legal_codes' : populate_legal_codes, 'clear_legal_codes' : clear_legal_codes,
-        'print_codes' : print_codes}
+        'print_codes' : print_codes, 'ct' : ct}
