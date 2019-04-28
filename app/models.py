@@ -42,6 +42,7 @@ class Person(db.Model):
         'polymorphic_on':type
     }
 
+
 class NaturalPerson(Person):
     id = db.Column(db.Integer, db.ForeignKey('person.id'), primary_key=True)
     cpf = db.Column(db.String(11), index=True, unique=True)
@@ -53,6 +54,12 @@ class NaturalPerson(Person):
     __mapper_args__ = {
         'polymorphic_identity':'natural',
     }
+
+    def asdict(self):
+        return {'name' : self.name,
+            'cpf' : self.cpf,
+            'rg' : self.rg,
+            'email' : self.email}
 
 
 class LegalPerson(Person):
@@ -66,6 +73,13 @@ class LegalPerson(Person):
     __mapper_args__ = {
         'polymorphic_identity':'legal',
     }
+
+    def asdict(self):
+        return {'name' : self.name,
+            'cnpj' : self.cnpj,
+            'code' : self.code,
+            'email' : self.email}
+
 
 class LegalPCodes(db.Model):
     __tablename__ = 'legal_codes'

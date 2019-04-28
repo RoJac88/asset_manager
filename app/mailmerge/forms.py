@@ -17,7 +17,7 @@ class AddDocx(FlaskForm):
 class SelectNaturalFields(FlaskForm):
     persons = QuerySelectMultipleField('Persons',
         query_factory=lambda: NaturalPerson.query.all(), allow_blank=False)
-    submit = SubmitField('Confirm')
+    submit = SubmitField('Merge')
 
 class SelectLegalFields(FlaskForm):
     persons = QuerySelectMultipleField('Persons',

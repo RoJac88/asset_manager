@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from flask_login import current_user, login_required
 from app.models import TemplateDocx, MergeField
 from app.mailmerge.forms import AddDocx, SelectLegalFields, SelectNaturalFields
+from app.mailmerge.handlers import create_docx
 from datetime import datetime
 from app.mailmerge import bp
 from mailmerge import MailMerge
@@ -56,12 +57,16 @@ def add_template():
         return redirect(url_for('mailmerge.mailmerge'))
     return render_template('mailmerge/add_docx.html', form=form)
 
-@bp.route('/template/<template_id>', methods=['GET'])
+@bp.route('/template/<template_id>', methods=['GET', 'POST'])
 def template(template_id):
     current_template = TemplateDocx.query.get(template_id)
     fields = current_template.fields
     labels = list(map(lambda x: x.label, fields))
-    form = False 
+    form = False
     if 'cpf' in labels: form = SelectNaturalFields()
     if 'cnpj' in labels: form = SelectLegalFields()
+    if form and form.validate_on_submit():
+        create_docx(current_template, form.persons.data, fields)
+        flash('Success! ')
+        return redirect(url_for('mailmerge.mailmerge'))
     return render_template('mailmerge/template_view.html', template=current_template, fields=fields, form=form)
