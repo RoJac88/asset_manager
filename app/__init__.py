@@ -36,6 +36,12 @@ def create_app(config_class=Config):
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
 
+    from app.people import bp as people_bp
+    app.register_blueprint(people_bp)
+
+    from app.mailmerge import bp as mailmerge_bp
+    app.register_blueprint(mailmerge_bp)
+
     if not app.debug and not app.testing:
         if not os.path.exists('logs'):
             os.mkdir('logs')

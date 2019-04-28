@@ -3,7 +3,7 @@
 {% block app_content %}
 {% if current_user.is_authenticated %}
 <div>
-	<a href="{{ url_for('main.add_template') }}"><button type="button" class="btn btn-primary">
+	<a href="{{ url_for('mailmerge.add_template') }}"><button type="button" class="btn btn-primary">
           <span class="glyphicon glyphicon-plus"></span> New Template
         </button></a>
 </div>
@@ -13,7 +13,7 @@
 	<div class="panel-heading text-center"><h4>MailMerge Templates</h4></div>
 	<div class="panel-body">
 		{% for template in templates %}
-		{% include '_template.html' %}
+		{% include 'mailmerge/_template.html' %}
 		{% endfor %}
   </div>
 </div>

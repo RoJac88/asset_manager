@@ -6,7 +6,7 @@ from app.models import User, Person, NaturalPerson, LegalPerson, Lawsuit, LegalP
 app = create_app()
 
 def populate_legal_codes():
-    dir = os.path.join('app', 'main', 'static')
+    dir = os.path.join('app', 'people', 'data')
     source = os.path.join(dir, 'legal_codes.csv')
     with open(source, encoding='utf-8-sig', newline='') as csvfile:
         print('CSV file located')

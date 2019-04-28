@@ -3,7 +3,7 @@
 {% block app_content %}
 {% if current_user.is_authenticated %}
 <div>
-	<a href="{{ url_for('main.add_person') }}"><button type="button" class="btn btn-default btn-sm">
+	<a href="{{ url_for('people.add_person') }}"><button type="button" class="btn btn-default btn-sm">
           <span class="glyphicon glyphicon-plus"></span> Insert Person
         </button></a>
 	<a href="{{ url_for('csv.upload_csv') }}"><button type="button" class="btn btn-default btn-sm">
@@ -22,7 +22,7 @@
 			<th>CPF / CNPJ</th>
 		</tr>
 		{% for person in people %}
-		{% include '_people.html' %}
+		{% include 'people/_people.html' %}
 		{% endfor %}
 	</table>
 	<nav aria-label="...">

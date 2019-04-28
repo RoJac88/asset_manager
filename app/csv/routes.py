@@ -38,7 +38,7 @@ def upload_csv():
                 added += 1
             else: n_dups += 1
         flash('Added {} people to the database, discarded {} duplicates'.format(added, n_dups))
-        return redirect(url_for('main.people'))
+        return redirect(url_for('people.people'))
 
     if form2.validate_on_submit() and form2.submit2.data:
         filename = secure_filename(form2.csv.data.filename)
@@ -61,5 +61,5 @@ def upload_csv():
                 added += 1
             else: n_dups += 1
         flash('Added {} persons to the database, discarded {} duplicates'.format(added, n_dups))
-        return redirect(url_for('main.people'))
+        return redirect(url_for('people.people'))
     return render_template('csv/upload_csv.html', form1=form1, form2=form2)
