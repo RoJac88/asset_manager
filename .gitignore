@@ -1,3 +1,4 @@
 /logs/
 /migrations
-app.db 
+app.db
+app/mailmerge/models

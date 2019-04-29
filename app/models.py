@@ -32,7 +32,6 @@ class UserFile(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     file_path = db.Column(db.String(130))
-    rel_path = db.Column(db.String(32))
     file_size = db.Column(db.Integer())
 
 class Person(db.Model):

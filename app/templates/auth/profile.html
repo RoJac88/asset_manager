@@ -1,15 +1,21 @@
 {% extends "base.html " %}
 
 {% block app_content %}
-<h2>{{  user.username }}'s Profile</h2>
-<div class="row">
-	<div class="col-sm-4" style="background-color:success">
-		<img src="{{ url_for('static', filename='avatar.png') }}" class="img-responsive">
-		<p>{{ user.email }}</p>
+<div class="container">
+	<div class="col-sm-4">
+		<div class=" well well-lg text-center">
+			<div class="well" style="background-image:url({{ url_for('static', filename='bg.png') }});">
+				<h2>{{  user.username }}</h2>
+			</div>
+			<div class="row">
+				<img src="{{ url_for('static', filename='avatar.png') }}" style="text-align: center" class="image-responsive">
+				<p>{{ user.email }}</p> 
+			</div>
+		</div>
 	</div>
 	<div class="col-sm-8">
 		<div class="panel panel-default">
-			<div class="panel-heading"><h3>{{ user.username }}'s files: </h3></div>
+			<div class="panel-heading text-center"><h2>{{ user.username }}'s Files: </h2></div>
 			<div class="panel-body">
 				{% for file in user.files %}
 				{% include 'auth/_file.html' %}

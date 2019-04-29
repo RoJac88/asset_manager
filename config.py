@@ -9,6 +9,7 @@ class Config(object):
     ITEMS_PER_PAGE = 25
     CSV_FOLDER = os.path.abspath(os.path.join('app', 'csv'))
     TEMPLATES_FOLDER = os.path.join('app', 'mailmerge', 'models')
+    OUTPUT_FOLDER = os.path.join('mailmerge', 'output')
     # Refers to mail merge templates, not jinja2 templates!
     MAX_CONTENT_LENGTH = 8 * 1024 * 1024 # 8 megabytes
-    STATIC_FOLDER = 'static'
+    STATIC_FOLDER = os.path.join('static')

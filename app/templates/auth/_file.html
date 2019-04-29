@@ -1,19 +1,21 @@
 <div class="row">
-	<div class="col-sm-4">
-		<img src="{{ url_for('static', filename='word.png') }}" class="img-responsive">
+	<div class="col-sm-3">
+		<div class="text-center">
+			<img src="{{ url_for('static', filename='word.png') }}" class="img-responsive" width=96 height=96>
+		</div>
 		<p class ="small"><strong>Size: {{ file.file_size }} bytes</strong></p>
 	</div>
-	<div class="col-sm-8">
-		<h3>{{ file.name }}</h3>
-		<p>Path: {{ file.rel_path }}</p>
+	<div class="col-sm-9">
+		<h4>{{ file.name }}</h4>
 		<p>Created: {{ moment(file.timestamp).format('LLLL') }}</p>
 		<div class="row">
-			<a href="{{ url_for('static', filename=file.rel_path) }}">
+			<a href="{{ url_for('mailmerge.download_file', filepath=file.file_path) }}">
 				<button type="button" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-download-alt"></span> Download</button>
 			</a>
-			<a href="#">
+			<a href="{{ url_for('mailmerge.delete_userfile', file_id=file.id) }}">
 				<button type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span> Delete</button>
 			</a>
 		</div>
 	</div>
 </div>
+<hr>
