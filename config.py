@@ -7,6 +7,8 @@ class Config(object):
         'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ITEMS_PER_PAGE = 25
-    CSV_FOLDER = 'app/csv/'
-    DOCX_FOLDER = 'app/main/docx/'
+    CSV_FOLDER = os.path.abspath(os.path.join('app', 'csv'))
+    TEMPLATES_FOLDER = os.path.join('app', 'mailmerge', 'models')
+    # Refers to mail merge templates, not jinja2 templates!
     MAX_CONTENT_LENGTH = 8 * 1024 * 1024 # 8 megabytes
+    STATIC_FOLDER = 'static'

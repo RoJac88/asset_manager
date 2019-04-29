@@ -17,9 +17,11 @@ class AddDocx(FlaskForm):
 class SelectNaturalFields(FlaskForm):
     persons = QuerySelectMultipleField('Persons',
         query_factory=lambda: NaturalPerson.query.all(), allow_blank=False)
+    output_name = StringField('File name', validators=[DataRequired()])
     submit = SubmitField('Merge')
 
 class SelectLegalFields(FlaskForm):
     persons = QuerySelectMultipleField('Persons',
         query_factory=lambda: LegalPerson.query.all(), allow_blank=False)
+    output_name = StringField('File name', validators=[DataRequired()])
     submit = SubmitField('Merge')

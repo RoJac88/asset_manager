@@ -1,7 +1,7 @@
 import os
 import csv
 from app import create_app, db
-from app.models import User, Person, NaturalPerson, LegalPerson, Lawsuit, LegalPCodes, TemplateDocx, MergeField
+from app.models import User, Person, NaturalPerson, LegalPerson, Lawsuit, LegalPCodes, TemplateDocx, MergeField, UserFile
 
 app = create_app()
 
@@ -48,33 +48,44 @@ def print_codes():
     else:
         print('legal_codes table is already empty')
 
-def clear_templates():
+def clear_mergemail():
     temps = TemplateDocx.query.all()
     if temps != []:
         for temp in temps:
-            print(temp.fields)
             db.session.delete(temp)
-        db.session.commit()
         print('template_docx table clear')
     else:
         print('template_docx table is already empty')
     fields = MergeField.query.all()
     if fields != []:
         for field in fields:
-            print(temp.field.label)
-            db.session.delete(temp)
-        db.session.commit()
+            db.session.delete(field)
         print('merge_field table clear')
     else:
         print('merge_field table is already empty')
+    files = UserFile.query.all()
+    if files != []:
+        for file in files:
+            db.session.delete(file)
+        print('user_files table clear')
+    else:
+        print('user_files table is already empty')
+    db.session.commit()
 
-def ct():
-    return clear_templates()
+def clear_files():
+    files = UserFile.query.all()
+    if files != []:
+        for file in files:
+            db.session.delete(file)
+        print('user_files table clear')
+    else:
+        print('user_files table is already empty')
+    db.session.commit()
 
 @app.shell_context_processor
 def make_shell_context():
     return {'db': db, 'User': User, 'Person': Person, 'NaturalPerson': NaturalPerson,
         'LegalPerson': LegalPerson, 'Lawsuit': Lawsuit, 'LegalPCodes': LegalPCodes,
-        'TemplateDocx': TemplateDocx, 'MergeField': MergeField,
-        'populate_legal_codes' : populate_legal_codes, 'clear_legal_codes' : clear_legal_codes,
-        'print_codes' : print_codes, 'ct' : ct}
+        'TemplateDocx': TemplateDocx, 'MergeField': MergeField, 'cf': clear_files,
+        'populate_legal_codes': populate_legal_codes, 'clear_legal_codes' : clear_legal_codes,
+        'print_codes': print_codes, 'pop': populate_legal_codes, 'UserFile': UserFile, 'cm': clear_mergemail}

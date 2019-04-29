@@ -13,6 +13,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     persons = db.relationship('Person', backref='creator', lazy='dynamic', foreign_keys='Person.user_id')
+    files = db.relationship('UserFile', backref='owner', lazy='select', foreign_keys='UserFile.user_id')
     persons_edited = db.relationship('Person', backref='editor', lazy='dynamic', foreign_keys='Person.last_editor')
     templates_added = db.relationship('TemplateDocx', backref='author', lazy='dynamic', foreign_keys='TemplateDocx.user_id')
 
@@ -24,6 +25,15 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+class UserFile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(32))
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    file_path = db.Column(db.String(130))
+    rel_path = db.Column(db.String(32))
+    file_size = db.Column(db.Integer())
 
 class Person(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -41,3 +41,8 @@ def register():
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form)
+
+@login_required
+@bp.route('/profile', methods=['GET'])
+def profile():
+    return render_template('auth/profile.html', user=current_user)
