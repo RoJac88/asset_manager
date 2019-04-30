@@ -3,6 +3,14 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms import StringField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Optional, Email
 from app.models import NaturalPerson, LegalPCodes
+from flask_wtf.file import FileField, FileRequired, FileAllowed
+
+class UploadCSVForm(FlaskForm):
+    csv = FileField('CSV (utf-8): ', validators=[
+        FileRequired(),
+        FileAllowed(['csv'], 'CSV flies only')
+    ])
+    submit = SubmitField('Upload')
 
 class EditNaturalPersonForm(FlaskForm):
     name = StringField('Name')

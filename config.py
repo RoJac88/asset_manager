@@ -7,7 +7,7 @@ class Config(object):
         'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ITEMS_PER_PAGE = 25
-    CSV_FOLDER = os.path.abspath(os.path.join('app', 'csv'))
+    CSV_FOLDER = os.path.abspath(os.path.join('app', 'csv')) # deprecate
     TEMPLATES_FOLDER = os.path.join('app', 'mailmerge', 'models')
     OUTPUT_FOLDER = os.path.join('mailmerge', 'output')
     # Refers to mail merge templates, not jinja2 templates!

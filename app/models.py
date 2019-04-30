@@ -70,6 +70,9 @@ class NaturalPerson(Person):
             'rg' : self.rg,
             'email' : self.email}
 
+    @staticmethod
+    def csv_editable():
+        return {'name', 'cpf', 'rg', 'email'}
 
 class LegalPerson(Person):
     id = db.Column(db.Integer, db.ForeignKey('person.id'), primary_key=True)
@@ -82,6 +85,10 @@ class LegalPerson(Person):
     __mapper_args__ = {
         'polymorphic_identity':'legal',
     }
+
+    @staticmethod
+    def csv_editable():
+        return {'name', 'cnpj', 'code', 'email'}
 
     def asdict(self):
         return {'name' : self.name,

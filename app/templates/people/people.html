@@ -1,14 +1,26 @@
 {% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
 {% if current_user.is_authenticated %}
-<div>
-	<a href="{{ url_for('people.add_person') }}"><button type="button" class="btn btn-default btn-sm">
-          <span class="glyphicon glyphicon-plus"></span> Insert Person
-        </button></a>
-	<a href="{{ url_for('csv.upload_csv') }}"><button type="button" class="btn btn-default btn-sm">
-          <span class="glyphicon glyphicon-open-file"></span> Import CSV
-        </button></a>
+<div class="container">
+	<div class="row">
+		<div class="col-sm-3">
+			<a href="{{ url_for('people.add_person') }}">
+				<button type="button" class="btn btn-default btn-sm">
+		          <span class="glyphicon glyphicon-plus"></span> Insert Person
+		        </button>
+			</a>
+				<button type="button" class="btn btn-default btn-sm" data-toggle="collapse" data-target="#csv">
+		          <span class="glyphicon glyphicon-open-file"></span> Import CSV
+		        </button>
+		</div>
+		<div class="col-sm-9">
+			<div class="collapse" id="csv">
+				{{ wtf.quick_form(form) }}
+			</div>
+		</div>
+	</div>
 </div>
 <br>
 {% endif %}

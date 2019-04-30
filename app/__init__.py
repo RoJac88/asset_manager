@@ -27,9 +27,6 @@ def create_app(config_class=Config):
     moment.init_app(app)
     login.init_app(app)
 
-    from app.csv import bp as csv_bp
-    app.register_blueprint(csv_bp)
-
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp)
 
