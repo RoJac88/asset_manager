@@ -4,7 +4,7 @@ import io
 
 from app import db
 from flask_login import current_user
-from app.models import NaturalPerson, LegalPerson
+from app.models import NaturalPerson, LegalPerson, LegalPCodes
 from itertools import chain
 from datetime import datetime
 
@@ -46,6 +46,9 @@ def cpf_isvalid(cpf_string):
     return True
 
 def import_csv(fie_storage_obj, bom):
+    code_digits = list(map(lambda x: x.code_digits, LegalPCodes.query.all()))
+    code_ids = list(map(lambda x: x.id, LegalPCodes.query.all()))
+    codes = dict(zip(code_digits, code_ids))
     encoding="utf8"
     if bom: encoding="utf_8_sig"
     print("Trying to import csv...")
@@ -64,27 +67,40 @@ def import_csv(fie_storage_obj, bom):
             print("Found CPF in data.keys()")
             data = {k:v for (k,v) in data.items() if k in NaturalPerson.csv_editable()}
             print("Filtered keys for csv editable")
+            data['cpf'] = data['cpf'].replace('.','').replace('-','')
             print(data)
             new_person = NaturalPerson(**data)
-            if cpf_isvalid(new_person.cpf):
+            cpfs = list(map(lambda x: x.cpf, NaturalPerson.query.all()))
+            if new_person.cpf not in cpfs and cpf_isvalid(new_person.cpf):
                 new_person.name = new_person.name.upper()
                 new_person.user_id = current_user.id
                 new_person.last_editor = current_user.id
                 new_person.timestamp = datetime.utcnow()
                 new_person.last_edit_time = datetime.utcnow()
                 db.session.add(new_person)
+                db.session.commit()
                 added += 1
-            else: print('{} is not a valid CPF'.format(new_person.cpf))
+            else: print('Validation failed for {}'.format(new_person))
         if 'cnpj' in data.keys() and 'name' in data.keys():
             data = {k:v for (k,v) in data.items() if k in LegalPerson.csv_editable()}
+            data['cnpj'] = data['cnpj'].replace('.','').replace('-','').replace('/','')
             new_person = LegalPerson(**data)
-            if cnpj_isvalid(new_person.cnpj):
+            cnpjs = list(map(lambda x: x.cnpj, LegalPerson.query.all()))
+            if new_person.cnpj not in cnpjs and cnpj_isvalid(new_person.cnpj):
+                new_person.code = new_person.code.replace('-','')
+                if new_person.code in code_digits:
+                    print('found good code')
+                    new_person.code = codes[new_person.code]
+                else:
+                    print('found bad code')
+                    new_person.code = 1
                 new_person.name = new_person.name.upper()
                 new_person.user_id = current_user.id
                 new_person.last_editor = current_user.id
                 new_person.timestamp = datetime.utcnow()
                 new_person.last_edit_time = datetime.utcnow()
                 db.session.add(new_person)
+                db.session.commit()
                 added += 1
-            else: print('{} is not a valid CNPJ'.format(new_person.cnpj))
+            else: print('Validation failed for {}'.format(new_person))
     return added

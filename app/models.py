@@ -91,9 +91,10 @@ class LegalPerson(Person):
         return {'name', 'cnpj', 'code', 'email'}
 
     def asdict(self):
+        mycode = LegalPCodes.query.get(self.code)
         return {'name' : self.name,
             'cnpj' : self.cnpj,
-            'code' : self.code,
+            'code' : str(mycode),
             'email' : self.email}
 
 
@@ -103,7 +104,7 @@ class LegalPCodes(db.Model):
     code_digits = db.Column(db.String(5), index=True, unique=True)
     description = db.Column(db.String(64))
     code_string = db.Column(db.String(6))
-    legal_persons = db.relationship('LegalPerson', backref='category', lazy='dynamic', foreign_keys='LegalPerson.code')
+    legal_persons = db.relationship('LegalPerson', backref='category', lazy='select', foreign_keys='LegalPerson.code')
 
     def __repr__(self):
         return '{} : {}'.format(self.code_string, self.description)

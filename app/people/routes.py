@@ -47,14 +47,13 @@ def people():
     form = UploadCSVForm()
     page = request.args.get('page', 1, type=int)
     people = Person.query.paginate(page, current_app.config['ITEMS_PER_PAGE'], False)
-    next_url = url_for('main.people', page=people.next_num) if people.has_next else None
-    prev_url = url_for('main.people', page=people.prev_num) if people.has_prev else None
+    next_url = url_for('people.people', page=people.next_num) if people.has_next else None
+    prev_url = url_for('people.people', page=people.prev_num) if people.has_prev else None
     if form.validate_on_submit():
         print('Form valid')
         f = request.files['csv']
         added = import_csv(f, form.bom.data)
         flash('Added {} entries to the database'.format(added))
-        db.session.commit()
         return redirect(url_for('people.people'))
     print(form.errors)
     return render_template('people/people.html', people=people.items, next_url=next_url, prev_url=prev_url, form=form)
