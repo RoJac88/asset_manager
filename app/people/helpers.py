@@ -8,6 +8,26 @@ from app.models import NaturalPerson, LegalPerson, LegalPCodes
 from itertools import chain
 from datetime import datetime
 
+def get_date(dt_string):
+    try:
+        date = datetime.strptime(dt_string, "%d-%m-%Y")
+        return date
+    except: ValueError
+    try:
+        date = datetime.strptime(dt_string, "%d/%m/%Y")
+        return date
+    except: ValueError
+    try:
+        date = datetime.strptime(dt_string, "%Y-%m-%d")
+        return date
+    except: ValueError
+    try:
+        date = datetime.strptime(dt_string, "%Y/%m/%d")
+        return date
+    except: ValueError
+    return None
+
+
 def hashdigit(cnpj, position):  # type: (str, int) -> int
     """
     Will compute the given `position` checksum digit for the `cnpj`
@@ -53,22 +73,15 @@ def import_csv(fie_storage_obj, bom):
     if bom: encoding="utf_8_sig"
     print("Trying to import csv...")
     f = fie_storage_obj
-    print(f)
     stream = io.StringIO(f.stream.read().decode(encoding), newline='')
-    print(stream)
     reader = csv.DictReader(stream)
     added = 0
     for row in reader:
         data = dict(row)
-        data =  {k.lower().replace('-','').replace('/','').replace('.',''): str(v) for k, v in data.items()}
-        print("Lower keys and string values:")
-        print(data)
+        data =  {k.lower().replace('-','').replace('/','').replace('.','').replace(' ','_'): str(v) for k, v in data.items()}
         if 'cpf' in data.keys() and 'name' in data.keys():
-            print("Found CPF in data.keys()")
             data = {k:v for (k,v) in data.items() if k in NaturalPerson.csv_editable()}
-            print("Filtered keys for csv editable")
             data['cpf'] = data['cpf'].replace('.','').replace('-','')
-            print(data)
             new_person = NaturalPerson(**data)
             cpfs = list(map(lambda x: x.cpf, NaturalPerson.query.all()))
             if new_person.cpf not in cpfs and cpf_isvalid(new_person.cpf):
@@ -78,10 +91,9 @@ def import_csv(fie_storage_obj, bom):
                 new_person.timestamp = datetime.utcnow()
                 new_person.last_edit_time = datetime.utcnow()
                 db.session.add(new_person)
-                db.session.commit()
                 added += 1
             else: print('Validation failed for {}'.format(new_person))
-        if 'cnpj' in data.keys() and 'name' in data.keys():
+        if 'cnpj' in data.keys() and 'legal_name' in data.keys():
             data = {k:v for (k,v) in data.items() if k in LegalPerson.csv_editable()}
             data['cnpj'] = data['cnpj'].replace('.','').replace('-','').replace('/','')
             new_person = LegalPerson(**data)
@@ -89,18 +101,18 @@ def import_csv(fie_storage_obj, bom):
             if new_person.cnpj not in cnpjs and cnpj_isvalid(new_person.cnpj):
                 new_person.code = new_person.code.replace('-','')
                 if new_person.code in code_digits:
-                    print('found good code')
                     new_person.code = codes[new_person.code]
                 else:
                     print('found bad code')
                     new_person.code = 1
-                new_person.name = new_person.name.upper()
+                new_person.legal_birth = get_date(new_person.legal_birth)
+                new_person.legal_death = get_date(new_person.legal_death)
+                new_person.legal_name = new_person.legal_name.upper()
                 new_person.user_id = current_user.id
                 new_person.last_editor = current_user.id
                 new_person.timestamp = datetime.utcnow()
                 new_person.last_edit_time = datetime.utcnow()
                 db.session.add(new_person)
-                db.session.commit()
                 added += 1
             else: print('Validation failed for {}'.format(new_person))
     return added

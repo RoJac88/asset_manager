@@ -1,7 +1,11 @@
 <tr valign="top">
 	<td>{{ person.id }}</td>
 	<td>{{ person.type.upper() }}</td>
+	{% if person.name %}
 	<td>{{ person.name }}</td>
+	{% elif person.legal_name %}
+	<td>{{ person.legal_name }}</td>
+	{% endif %}
 	<td>{{ (person.cpf[:3]+'.'+person.cpf[3:6]+'.'+person.cpf[6:9]+'-'+person.cpf[9:]) if person.type == 'natural' }}
 		{{ person.cnpj[:2]+'.'+person.cnpj[2:5]+'.'+person.cnpj[5:8]+'/'+person.cnpj[8:12]+'-'+person.cnpj[12:] if person.type == 'legal' }}</td>
 	{% if current_user.is_authenticated %}

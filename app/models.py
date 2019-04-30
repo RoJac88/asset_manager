@@ -36,7 +36,6 @@ class UserFile(db.Model):
 
 class Person(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64))
     email = db.Column(db.String(120))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     last_edit_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
@@ -54,6 +53,7 @@ class Person(db.Model):
 
 class NaturalPerson(Person):
     id = db.Column(db.Integer, db.ForeignKey('person.id'), primary_key=True)
+    name = db.Column(db.String(64))
     cpf = db.Column(db.String(11), index=True, unique=True)
     rg = db.Column(db.String(11))
 
@@ -66,8 +66,8 @@ class NaturalPerson(Person):
 
     def asdict(self):
         return {'name' : self.name,
-            'cpf' : self.cpf,
-            'rg' : self.rg,
+            'cpf' : person.cpf[:3]+'.'+person.cpf[3:6]+'.'+person.cpf[6:9]+'-'+person.cpf[9:],
+            'rg' : str(self.rg),
             'email' : self.email}
 
     @staticmethod
@@ -76,11 +76,21 @@ class NaturalPerson(Person):
 
 class LegalPerson(Person):
     id = db.Column(db.Integer, db.ForeignKey('person.id'), primary_key=True)
+    legal_name = db.Column(db.String(64))
     cnpj = db.Column(db.String(20), index=True, unique=True)
     code = db.Column(db.Integer, db.ForeignKey('legal_codes.id'))
+    addr_bairro = db.Column(db.String(120))
+    addr_rua = db.Column(db.String(120))
+    addr_num = db.Column(db.String(5))
+    addr_cep = db.Column(db.String(11))
+    addr_city = db.Column(db.String(32))
+    addr_uf = db.Column(db.String(2))
+    legal_birth = db.Column(db.DateTime, index=True, default=datetime(1889,11,15))
+    legal_death = db.Column(db.DateTime)
+    legal_status = db.Column(db.String(22))
 
     def __repr__(self):
-        return '{}, CNPJ: {}'.format(self.name, self.cnpj)
+        return '{}, CNPJ: {}'.format(self.legal_name, self.cnpj)
 
     __mapper_args__ = {
         'polymorphic_identity':'legal',
@@ -88,14 +98,24 @@ class LegalPerson(Person):
 
     @staticmethod
     def csv_editable():
-        return {'name', 'cnpj', 'code', 'email'}
+        return {'legal_name', 'cnpj', 'code', 'email', 'addr_bairro', 'addr_rua', 'legal_status',
+            'addr_num', 'addr_cep', 'addr_city', 'addr_uf', 'legal_birth', 'legal_death'}
 
     def asdict(self):
         mycode = LegalPCodes.query.get(self.code)
-        return {'name' : self.name,
-            'cnpj' : self.cnpj,
-            'code' : str(mycode),
-            'email' : self.email}
+        return {'name': self.legal_name,
+            'cnpj': self.cnpj[:2]+'.'+self.cnpj[2:5]+'.'+self.cnpj[5:8]+'/'+self.cnpj[8:12]+'-'+self.cnpj[12:],
+            'code': str(mycode),
+            'email': self.email,
+            'addr_bairro': self.addr_bairro,
+            'addr_rua': self.addr_rua,
+            'addr_num': self.addr_num,
+            'addr_cep': self.addr_cep,
+            'addr_city': self.addr_city,
+            'addr_uf': self.addr_uf,
+            'legal_birth': str(self.legal_birth),
+            'legal_death': str(self.legal_death),
+            'legal_status': self.legal_status }
 
 
 class LegalPCodes(db.Model):

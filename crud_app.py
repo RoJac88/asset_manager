@@ -82,10 +82,21 @@ def clear_files():
         print('user_files table is already empty')
     db.session.commit()
 
+def clear_persons():
+    persons = Person.query.all()
+    if persons != []:
+        for person in persons:
+            db.session.delete(person)
+        print('persons table clear')
+    else:
+        print('persons table is already empty')
+    db.session.commit()
+
 @app.shell_context_processor
 def make_shell_context():
     return {'db': db, 'User': User, 'Person': Person, 'NaturalPerson': NaturalPerson,
         'LegalPerson': LegalPerson, 'Lawsuit': Lawsuit, 'LegalPCodes': LegalPCodes,
         'TemplateDocx': TemplateDocx, 'MergeField': MergeField, 'cf': clear_files,
         'populate_legal_codes': populate_legal_codes, 'clear_legal_codes' : clear_legal_codes,
-        'print_codes': print_codes, 'pop': populate_legal_codes, 'UserFile': UserFile, 'cm': clear_mergemail}
+        'print_codes': print_codes, 'pop': populate_legal_codes, 'UserFile': UserFile, 'cm': clear_mergemail,
+        'clear_persons' : clear_persons}

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms import StringField, SubmitField, BooleanField
+from wtforms import StringField, SubmitField, BooleanField, DateField
 from wtforms.validators import ValidationError, DataRequired, Optional, Email
 from app.models import NaturalPerson, LegalPCodes
 from flask_wtf.file import FileField, FileRequired, FileAllowed
@@ -23,10 +23,19 @@ class EditNaturalPersonForm(FlaskForm):
         if len(rg.data) > 11: raise ValidationError('Invalid RG')
 
 class EditLegalPersonForm(FlaskForm):
-    name = StringField('Name')
+    legal_name = StringField('Legal Name')
     code = QuerySelectField('Code',
         query_factory=lambda: LegalPCodes.query, allow_blank=False)
     email = StringField('Email', validators=[Optional(), Email()])
+    addr_bairro = StringField('Bairro', validators=[Optional()])
+    addr_rua = StringField('Rua', validators=[Optional()])
+    addr_num = StringField('N.', validators=[Optional()])
+    addr_cep = StringField('CEP', validators=[Optional()])
+    addr_city = StringField('City', validators=[Optional()])
+    addr_uf = StringField('UF', validators=[Optional()])
+    legal_birth = DateField(validators=[Optional()])
+    legal_death = DateField(validators=[Optional()])
+    legal_status = StringField(validators=[Optional()])
     submit = SubmitField('Update')
 
     def validate_cnpj(self, cnpj):
@@ -36,11 +45,20 @@ class EditLegalPersonForm(FlaskForm):
             raise ValidationError('Invalid CNPJ number')
 
 class AddLegalPersonFrom(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
+    legal_name = StringField('Legal Name', validators=[DataRequired()])
     cnpj = StringField('CNPJ', validators=[DataRequired()])
     code = QuerySelectField('Code',
         query_factory=lambda: LegalPCodes.query, allow_blank=False)
     email = StringField('Email', validators=[Optional(), Email()])
+    addr_bairro = StringField('Bairro', validators=[Optional()])
+    addr_rua = StringField('Rua', validators=[Optional()])
+    addr_num = StringField('N.', validators=[Optional()])
+    addr_cep = StringField('CEP', validators=[Optional()])
+    addr_city = StringField('City', validators=[Optional()])
+    addr_uf = StringField('UF', validators=[Optional()])
+    legal_birth = DateField('YYY-MM-DD', validators=[Optional()])
+    legal_death = DateField('YYY-MM-DD', validators=[Optional()])
+    legal_status = StringField(validators=[Optional()])
     submit = SubmitField('Insert')
 
     def validate_cnpj(self, cnpj):

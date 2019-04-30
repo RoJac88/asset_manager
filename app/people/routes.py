@@ -30,15 +30,15 @@ def add_person():
         return redirect(url_for('main.index'))
     if form2.validate_on_submit() and form2.submit.data:
         user_id = current_user.id
-        name = form2.name.data.upper()
+        legal_name = form2.legal_name.data.upper()
         cnpj = form2.cnpj.data
         code = form2.code.data.id
         email = form2.email.data
-        new_person = LegalPerson(name=name,cnpj=cnpj,code=code,user_id=user_id,
+        new_person = LegalPerson(legal_name=legal_name,cnpj=cnpj,code=code,user_id=user_id,
             email=email,last_editor=user_id)
         db.session.add(new_person)
         db.session.commit()
-        flash('Added {} to the database!'.format(name))
+        flash('Added {} to the database!'.format(legal_name))
         return redirect(url_for('main.index'))
     return render_template('people/add_person.html', form1=form1, form2=form2)
 
@@ -50,9 +50,9 @@ def people():
     next_url = url_for('people.people', page=people.next_num) if people.has_next else None
     prev_url = url_for('people.people', page=people.prev_num) if people.has_prev else None
     if form.validate_on_submit():
-        print('Form valid')
         f = request.files['csv']
         added = import_csv(f, form.bom.data)
+        db.session.commit()
         flash('Added {} entries to the database'.format(added))
         return redirect(url_for('people.people'))
     print(form.errors)
@@ -79,9 +79,18 @@ def person(person_id):
         flash('Your changes have been saved')
         return redirect(url_for('people.people'))
     elif form.validate_on_submit() and current_person.type == 'legal':
-        current_person.name = form.name.data.upper()
+        current_person.legal_name = form.legal_name.data.upper()
         current_person.code = form.code.data.id
         current_person.email = form.email.data
+        current_person.addr_cep = form.addr_cep.data
+        current_person.addr_bairro = form.addr_bairro.data
+        current_person.addr_rua = form.addr_rua.data
+        current_person.addr_num = form.addr_num.data
+        current_person.addr_uf = form.addr_uf.data
+        current_person.addr_city = form.addr_city.data
+        current_person.legal_status = form.legal_status.data
+        current_person.legal_birth = form.legal_birth.data
+        current_person.legal_death = form.legal_death.data
         current_person.last_editor = current_user.id
         current_person.last_edit_time = datetime.utcnow()
         db.session.commit()
@@ -94,9 +103,18 @@ def person(person_id):
         return render_template('people/natural_person_edit.html', person=current_person, form=form, creator=current_person.creator.username,
             editor=current_person.editor.username)
     elif current_person.type == 'legal':
-        form.name.data = current_person.name
+        form.legal_name.data = current_person.legal_name
         form.code.data = current_person.category
         form.email.data = current_person.email
+        form.addr_cep.data = current_person.addr_cep
+        form.addr_bairro.data = current_person.addr_bairro
+        form.addr_rua.data = current_person.addr_rua
+        form.addr_num.data = current_person.addr_num
+        form.addr_uf.data = current_person.addr_uf
+        form.addr_city.data = current_person.addr_city
+        form.legal_status.data = current_person.legal_status
+        form.legal_birth.data = current_person.legal_birth
+        form.legal_death.data = current_person.legal_death
         return render_template('people/legal_person_edit.html', person=current_person, form=form, creator=current_person.creator.username,
             editor=current_person.editor.username)
 

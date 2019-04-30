@@ -84,6 +84,7 @@ def template(template_id):
                 user_id = current_user.id,
                 file_size = os.path.getsize(path),
                 file_path = path)
+            current_template.docs_generated += n
             db.session.add(new_file)
             db.session.commit()
             flash('Merge successful!\nFile: {}'.format(file_label))
