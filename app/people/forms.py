@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import ValidationError, DataRequired, Optional, Email
 from app.models import NaturalPerson, LegalPCodes
 from flask_wtf.file import FileField, FileRequired, FileAllowed
@@ -10,6 +10,7 @@ class UploadCSVForm(FlaskForm):
         FileRequired(),
         FileAllowed(['csv'], 'CSV flies only')
     ])
+    bom = BooleanField('BOM mark: ')
     submit = SubmitField('Upload')
 
 class EditNaturalPersonForm(FlaskForm):

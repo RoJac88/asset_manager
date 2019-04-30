@@ -1,6 +1,25 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 
+{% block head %}
+	{{ super() }}
+	<style>
+		#bom {
+		  width: 24px;
+			height: 24px;
+			margin-bottom: 4px;
+		}
+		#csv {
+			background-color: snow;
+			padding-left: 8px;
+			padding-top: 4px;
+			padding-bottom: 4px;
+			margin-right: 14px;
+			border-style: inset;
+		}
+	</style>
+{% endblock %}
+
 {% block app_content %}
 {% if current_user.is_authenticated %}
 <div class="container">
@@ -15,9 +34,23 @@
 		          <span class="glyphicon glyphicon-open-file"></span> Import CSV
 		        </button>
 		</div>
-		<div class="col-sm-9">
+		<div class="col-sm-7">
 			<div class="collapse" id="csv">
-				{{ wtf.quick_form(form) }}
+				<form method="post" action="" class="form-inline" role="form" enctype="multipart/form-data">
+					<div class = "form-group">
+				    {{ form.csrf_token }}
+				    {{ form.csv.label(class="control-label") }}
+						{{ form.csv(class="form-control") }}
+					</div>
+					<div class ="form-group">
+						{{ form.bom.label() }}
+						{{ form.bom(class="form-control") }}
+					</div>
+					<div class ="form-group required">
+						{{ form.submit.label(class="sr-only") }}
+						{{ form.submit(class="form-control btn-success") }}
+					</div>
+				</form>
 			</div>
 		</div>
 	</div>

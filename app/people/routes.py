@@ -7,7 +7,7 @@ from app import db
 from app.people.forms import AddLegalPersonFrom, AddNaturalPersonForm, EditNaturalPersonForm, EditLegalPersonForm, UploadCSVForm
 from flask_login import current_user, login_required
 from app.models import User, Person, NaturalPerson, LegalPerson
-from app.people.helpers import cpf_isvalid, cnpj_isvalid
+from app.people.helpers import import_csv
 from datetime import datetime
 from app.people import bp
 
@@ -52,43 +52,9 @@ def people():
     if form.validate_on_submit():
         print('Form valid')
         f = request.files['csv']
-        stream = io.StringIO(f.stream.read().decode("UTF8"), newline='')
-        reader = csv.DictReader(stream)
-        added = 0
-        for row in reader:
-            data = dict(row)
-            data =  {k.lower().replace('-',''): str(v) for k, v in data.items()}
-            print("Lower keys and string values:")
-            print(data)
-            if 'cpf' in data.keys():
-                print("Found CPF in data.keys()")
-                data = {k:v for (k,v) in data.items() if k in NaturalPerson.csv_editable()}
-                print("Filtered keys for csv editable")
-                print(data)
-                new_person = NaturalPerson(**data)
-                if cpf_isvalid(new_person.cpf):
-                    new_person.name = new_person.name.upper()
-                    new_person.user_id = current_user.id
-                    new_person.last_editor = current_user.id
-                    new_person.timestamp = datetime.utcnow()
-                    new_person.last_edit_time = datetime.utcnow()
-                    db.session.add(new_person)
-                    added += 1
-                else: print('{} is not a valid CPF'.format(new_person.cpf))
-            if 'cnpj' in data.keys():
-                data = {k:v for (k,v) in data.items() if k in LegalPerson.csv_editable()}
-                new_person = LegalPerson(**data)
-                if cnpj_isvalid(new_person.cnpj):
-                    new_person.name = new_person.name.upper()
-                    new_person.user_id = current_user.id
-                    new_person.last_editor = current_user.id
-                    new_person.timestamp = datetime.utcnow()
-                    new_person.last_edit_time = datetime.utcnow()
-                    db.session.add(new_person)
-                    added += 1
-                else: print('{} is not a valid CNPJ'.format(new_person.cnpj))
-        db.session.commit()
+        added = import_csv(f, form.bom.data)
         flash('Added {} entries to the database'.format(added))
+        db.session.commit()
         return redirect(url_for('people.people'))
     print(form.errors)
     return render_template('people/people.html', people=people.items, next_url=next_url, prev_url=prev_url, form=form)
@@ -108,7 +74,7 @@ def person(person_id):
         current_person.name = form.name.data.upper()
         current_person.rg = form.rg.data
         current_person.email = form.email.data
-        current_person.last_editor = current_user
+        current_person.last_editor = current_user.id
         current_person.last_edit_time = datetime.utcnow()
         db.session.commit()
         flash('Your changes have been saved')
