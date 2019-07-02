@@ -3,3 +3,4 @@
 app.db
 app/mailmerge/models
 app/mailmerge/output
+.env 

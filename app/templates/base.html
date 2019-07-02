@@ -1,12 +1,15 @@
 {% extends 'bootstrap/base.html' %}
 
 {% block scripts %}
-    {{ super() }}
-    {{ moment.include_moment() }}
+  {{ super() }}
+  {{ moment.include_moment() }}
+  <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
 {% endblock %}
 
 {% block styles %}
-{{super()}}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
 <style>
 body {
   background-image: url("{{ url_for('static', filename='bg.png') }}");
