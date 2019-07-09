@@ -70,6 +70,12 @@ def person(person_id):
         current_person.name = form.name.data.upper()
         current_person.rg = form.rg.data
         current_person.email = form.email.data
+        current_person.addr_cep = form.addr_cep_nat.data
+        current_person.addr_bairro = form.addr_bairro.data
+        current_person.addr_rua = form.addr_rua.data
+        current_person.addr_num = form.addr_num.data
+        current_person.addr_uf = form.addr_uf.data
+        current_person.addr_city = form.addr_city.data
         current_person.last_editor = current_user.id
         current_person.last_edit_time = datetime.utcnow()
         db.session.commit()
@@ -79,7 +85,7 @@ def person(person_id):
         current_person.legal_name = form.legal_name.data.upper()
         current_person.code = form.code.data.id
         current_person.email = form.email.data
-        current_person.addr_cep = form.addr_cep.data
+        current_person.addr_cep = form.addr_cep_leg.data
         current_person.addr_bairro = form.addr_bairro.data
         current_person.addr_rua = form.addr_rua.data
         current_person.addr_num = form.addr_num.data
@@ -97,13 +103,19 @@ def person(person_id):
         form.name.data = current_person.name
         form.rg.data = current_person.rg
         form.email.data = current_person.email
+        form.addr_cep_nat.data = current_person.addr_cep
+        form.addr_bairro.data = current_person.addr_bairro
+        form.addr_rua.data = current_person.addr_rua
+        form.addr_num.data = current_person.addr_num
+        form.addr_uf.data = current_person.addr_uf
+        form.addr_city.data = current_person.addr_city
         return render_template('people/natural_person_edit.html', person=current_person, form=form, creator=current_person.creator.username,
             editor=current_person.editor.username)
     elif current_person.type == 'legal':
         form.legal_name.data = current_person.legal_name
         form.code.data = current_person.category
         form.email.data = current_person.email
-        form.addr_cep.data = current_person.addr_cep
+        form.addr_cep_leg.data = current_person.addr_cep
         form.addr_bairro.data = current_person.addr_bairro
         form.addr_rua.data = current_person.addr_rua
         form.addr_num.data = current_person.addr_num

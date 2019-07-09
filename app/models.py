@@ -37,6 +37,13 @@ class UserFile(db.Model):
 class Person(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120))
+    addr_cep = db.Column(db.String(8), db.ForeignKey('cep.id'))
+    addr_bairro = db.Column(db.String(64))
+    addr_rua = db.Column(db.String(64))
+    addr_num = db.Column(db.String(5))
+    addr_city = db.Column(db.String(32))
+    addr_uf = db.Column(db.String(2))
+    addr_compl = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     last_edit_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -68,23 +75,24 @@ class NaturalPerson(Person):
         return {'name' : self.name,
             'cpf' : person.cpf[:3]+'.'+person.cpf[3:6]+'.'+person.cpf[6:9]+'-'+person.cpf[9:],
             'rg' : str(self.rg),
-            'email' : self.email}
+            'email' : self.email,
+            'addr_bairro': self.addr_bairro,
+            'addr_rua': self.addr_rua,
+            'addr_num': self.addr_num,
+            'addr_cep': self.addr_cep,
+            'addr_city': self.addr_city,
+            'addr_uf': self.addr_uf}
 
     @staticmethod
     def csv_editable():
-        return {'name', 'cpf', 'rg', 'email'}
+        return {'name', 'cpf', 'rg', 'email', 'addr_bairro', 'addr_rua',
+            'addr_num', 'addr_cep', 'addr_city', 'addr_uf',}
 
 class LegalPerson(Person):
     id = db.Column(db.Integer, db.ForeignKey('person.id'), primary_key=True)
     legal_name = db.Column(db.String(64))
     cnpj = db.Column(db.String(20), index=True, unique=True)
     code = db.Column(db.Integer, db.ForeignKey('legal_codes.id'))
-    addr_bairro = db.Column(db.String(120))
-    addr_rua = db.Column(db.String(120))
-    addr_num = db.Column(db.String(5))
-    addr_cep = db.Column(db.String(11))
-    addr_city = db.Column(db.String(32))
-    addr_uf = db.Column(db.String(2))
     legal_birth = db.Column(db.DateTime, index=True, default=datetime(1889,11,15))
     legal_death = db.Column(db.DateTime)
     legal_status = db.Column(db.String(22))
@@ -147,6 +155,39 @@ class MergeField(db.Model):
     label = db.Column(db.String(24))
     template = db.Column(db.Integer, db.ForeignKey('template_docx.id'))
 
+class Imovel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(24))
+    sql = db.Column(db.String(9))
+    addr_cep = db.Column(db.String(8), db.ForeignKey('cep.id'))
+    addr_cidade = db.Column(db.String(24))
+    addr_rua = db.Column(db.String(64))
+    addr_num = db.Column(db.String(5))
+    addr_compl = db.Column(db.String(64))
+    matricula_n = db.Column(db.String(6))
+    matricula_file = db.Column(db.String(128))
+    matricula_file_date = db.Column(db.DateTime, index=True, default=datetime(1889,11,15))
+
+class Cep(db.Model):
+    id = db.Column(db.String(8), primary_key=True)
+    cidade = db.Column(db.String(24))
+    uf = db.Column(db.String(2))
+    bairro = db.Column(db.String(48))
+    rua = db.Column(db.String(64))
+    num = db.Column(db.String(8))
+    compl = db.Column(db.String(24))
+    legal_persons = db.relationship('LegalPerson', backref='cep', lazy='select', foreign_keys='LegalPerson.addr_cep')
+    imoveis = db.relationship('Imovel', backref='cep', lazy='select', foreign_keys='Imovel.addr_cep')
+
+    def asdict(self):
+        return {
+            'cidade' : self.cidade,
+            'uf' : self.uf,
+            'bairro' : self.bairro,
+            'rua' : self.rua,
+            'num' : self.num,
+            'compl' : self.compl,
+            }
 
 class Lawsuit(db.Model):
     id = db.Column(db.Integer, primary_key=True)

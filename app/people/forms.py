@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms import StringField, SubmitField, BooleanField, DateField
 from wtforms.validators import ValidationError, DataRequired, Optional, Email
-from app.models import NaturalPerson, LegalPCodes
+from app.models import NaturalPerson, LegalPCodes, Cep
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 
 class UploadCSVForm(FlaskForm):
@@ -17,22 +17,34 @@ class EditNaturalPersonForm(FlaskForm):
     name = StringField('Name')
     rg = StringField('RG', validators=[Optional()])
     email = StringField('Email', validators=[Optional(), Email()])
+    addr_cep_nat = StringField('CEP')
+    addr_city = StringField('City', validators=[Optional()])
+    addr_uf = StringField('UF', validators=[Optional()])
+    addr_bairro = StringField('Bairro', validators=[Optional()])
+    addr_rua = StringField('Rua', validators=[Optional()])
+    addr_num = StringField('N.', validators=[Optional()])
+    addr_compl = StringField('Compl', validators=[Optional()])
     submit = SubmitField('Update')
 
     def validate_rg(self, rg):
         if len(rg.data) > 11: raise ValidationError('Invalid RG')
+
+    def validate_addr_cep_nat(self, addr_cep):
+        if Cep.query.get(addr_cep.data) == None:
+            raise ValidationError('Invalid CEP')
 
 class EditLegalPersonForm(FlaskForm):
     legal_name = StringField('Legal Name')
     code = QuerySelectField('Code',
         query_factory=lambda: LegalPCodes.query, allow_blank=False)
     email = StringField('Email', validators=[Optional(), Email()])
+    addr_cep_leg = StringField('CEP')
+    addr_city = StringField('City', validators=[Optional()])
+    addr_uf = StringField('UF', validators=[Optional()])
     addr_bairro = StringField('Bairro', validators=[Optional()])
     addr_rua = StringField('Rua', validators=[Optional()])
     addr_num = StringField('N.', validators=[Optional()])
-    addr_cep = StringField('CEP', validators=[Optional()])
-    addr_city = StringField('City', validators=[Optional()])
-    addr_uf = StringField('UF', validators=[Optional()])
+    addr_compl = StringField('Compl', validators=[Optional()])
     legal_birth = DateField(validators=[Optional()])
     legal_death = DateField(validators=[Optional()])
     legal_status = StringField(validators=[Optional()])
@@ -44,18 +56,23 @@ class EditLegalPersonForm(FlaskForm):
         if len(cnpj.data) != 14:
             raise ValidationError('Invalid CNPJ number')
 
+    def validate_addr_cep_leg(self, addr_cep):
+        if Cep.query.get(addr_cep.data) == None:
+            raise ValidationError('Invalid CEP')
+
 class AddLegalPersonFrom(FlaskForm):
     legal_name = StringField('Legal Name', validators=[DataRequired()])
     cnpj = StringField('CNPJ', validators=[DataRequired()])
     code = QuerySelectField('Code',
         query_factory=lambda: LegalPCodes.query, allow_blank=False)
     email = StringField('Email', validators=[Optional(), Email()])
+    addr_cep_leg = StringField('CEP')
+    addr_city = StringField('City', validators=[Optional()])
+    addr_uf = StringField('UF', validators=[Optional()])
     addr_bairro = StringField('Bairro', validators=[Optional()])
     addr_rua = StringField('Rua', validators=[Optional()])
     addr_num = StringField('N.', validators=[Optional()])
-    addr_cep = StringField('CEP', validators=[Optional()])
-    addr_city = StringField('City', validators=[Optional()])
-    addr_uf = StringField('UF', validators=[Optional()])
+    addr_compl = StringField('Compl', validators=[Optional()])
     legal_birth = DateField('YYY-MM-DD', validators=[Optional()])
     legal_death = DateField('YYY-MM-DD', validators=[Optional()])
     legal_status = StringField(validators=[Optional()])
@@ -67,12 +84,27 @@ class AddLegalPersonFrom(FlaskForm):
         if len(cnpj.data) != 14:
             raise ValidationError('Invalid CNPJ number')
 
+    def validate_addr_cep_leg(self, addr_cep):
+        if Cep.query.get(addr_cep.data) == None:
+            raise ValidationError('Invalid CEP')
+
 class AddNaturalPersonForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     cpf = StringField('CPF', validators=[DataRequired()])
     rg = StringField('RG', validators=[Optional()])
     email = StringField('Email', validators=[Optional(), Email()])
+    addr_cep_nat = StringField('CEP')
+    addr_city = StringField('City', validators=[Optional()])
+    addr_uf = StringField('UF', validators=[Optional()])
+    addr_bairro = StringField('Bairro', validators=[Optional()])
+    addr_rua = StringField('Rua', validators=[Optional()])
+    addr_num = StringField('N.', validators=[Optional()])
+    addr_compl = StringField('Compl', validators=[Optional()])
     submit = SubmitField('Insert')
+
+    def validate_addr_cep_nat(self, addr_cep):
+        if Cep.query.get(addr_cep.data) == None:
+            raise ValidationError('Invalid CEP')
 
     def validate_rg(self, rg):
         if len(rg.data) > 11: raise ValidationError('Invalid RG')

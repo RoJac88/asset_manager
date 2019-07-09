@@ -4,7 +4,7 @@ import io
 
 from app import db
 from flask_login import current_user
-from app.models import NaturalPerson, LegalPerson, LegalPCodes
+from app.models import NaturalPerson, LegalPerson, LegalPCodes, Cep
 from itertools import chain
 from datetime import datetime
 
@@ -65,6 +65,17 @@ def cpf_isvalid(cpf_string):
         return False
     return True
 
+def cep_isvalid(cep):
+    if Cep.query.get(cep) is None:
+        return False
+    else:
+        return True
+
+def safe_insert(dictionary, key, val):
+    if not key in dictionary or dictionary[key] is None:
+        dictionary[key] = val
+        return True
+
 def import_csv(fie_storage_obj, bom):
     code_digits = list(map(lambda x: x.code_digits, LegalPCodes.query.all()))
     code_ids = list(map(lambda x: x.id, LegalPCodes.query.all()))
@@ -82,6 +93,22 @@ def import_csv(fie_storage_obj, bom):
         if 'cpf' in data.keys() and 'name' in data.keys():
             data = {k:v for (k,v) in data.items() if k in NaturalPerson.csv_editable()}
             data['cpf'] = data['cpf'].replace('.','').replace('-','')
+            if 'addr_cep' in data.keys():
+                cep = str(data['addr_cep']).zfill(8)
+                data['addr_cep'] = cep
+                print(cep)
+                if cep_isvalid(cep):
+                    print('VALID!')
+                    cep = Cep.query.get(cep)
+                    safe_insert(data, 'addr_uf', cep.uf)
+                    safe_insert(data, 'addr_city', cep.cidade)
+                    safe_insert(data, 'addr_bairro', cep.bairro)
+                    safe_insert(data, 'addr_rua', cep.rua)
+                    safe_insert(data, 'addr_num', cep.num)
+                    safe_insert(data, 'addr_compl', cep.compl)
+                else:
+                    print("Invalid CEP: {}".format(cep))
+                    data['addr_cep'] = ""
             new_person = NaturalPerson(**data)
             cpfs = list(map(lambda x: x.cpf, NaturalPerson.query.all()))
             if new_person.cpf not in cpfs and cpf_isvalid(new_person.cpf):
@@ -96,6 +123,22 @@ def import_csv(fie_storage_obj, bom):
         if 'cnpj' in data.keys() and 'legal_name' in data.keys():
             data = {k:v for (k,v) in data.items() if k in LegalPerson.csv_editable()}
             data['cnpj'] = data['cnpj'].replace('.','').replace('-','').replace('/','')
+            if 'addr_cep' in data.keys():
+                cep = str(data['addr_cep']).zfill(8)
+                data['addr_cep'] = cep
+                print(cep)
+                if cep_isvalid(cep):
+                    print('VALID!')
+                    cep = Cep.query.get(cep)
+                    safe_insert(data, 'addr_uf', cep.uf)
+                    safe_insert(data, 'addr_city', cep.cidade)
+                    safe_insert(data, 'addr_bairro', cep.bairro)
+                    safe_insert(data, 'addr_rua', cep.rua)
+                    safe_insert(data, 'addr_num', cep.num)
+                    safe_insert(data, 'addr_compl', cep.compl)
+                else:
+                    print("Invalid CEP: {}".format(cep))
+                    data['addr_cep'] = ""
             new_person = LegalPerson(**data)
             cnpjs = list(map(lambda x: x.cnpj, LegalPerson.query.all()))
             if new_person.cnpj not in cnpjs and cnpj_isvalid(new_person.cnpj):

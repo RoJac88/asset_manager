@@ -1,9 +1,33 @@
 import os
 import csv
 from app import create_app, db
-from app.models import User, Person, NaturalPerson, LegalPerson, Lawsuit, LegalPCodes, TemplateDocx, MergeField, UserFile
+from app.models import User, Person, NaturalPerson, LegalPerson, Lawsuit, LegalPCodes, TemplateDocx, MergeField, UserFile, Cep
 
 app = create_app()
+
+def populate_ceps():
+    dir = os.path.join('app', 'main', 'data')
+    source = os.path.join(dir, 'ceps.csv')
+    with open(source, encoding='utf-8-sig', newline='') as csvfile:
+        print('CSV file located')
+        reader = csv.reader(csvfile)
+        data = {}
+        for row in reader:
+            new_cep = Cep(
+                id = str(row[0]).zfill(8),
+                cidade = row[1],
+                uf = row[2],
+                bairro = row[3],
+                rua = row[4],
+                num = row[5],
+                compl = row[6]
+            )
+            print('Adding new CEP: {}'.format(new_cep.id))
+            db.session.add(new_cep)
+            print('OK!')
+    db.session.commit()
+    print('CEPs:')
+    print(len(Cep.query.all()))
 
 def populate_legal_codes():
     dir = os.path.join('app', 'people', 'data')
@@ -99,4 +123,4 @@ def make_shell_context():
         'TemplateDocx': TemplateDocx, 'MergeField': MergeField, 'cf': clear_files,
         'populate_legal_codes': populate_legal_codes, 'clear_legal_codes' : clear_legal_codes,
         'print_codes': print_codes, 'pop': populate_legal_codes, 'UserFile': UserFile, 'cm': clear_mergemail,
-        'clear_persons' : clear_persons}
+        'clear_persons' : clear_persons, 'ceps' : populate_ceps}
