@@ -34,6 +34,30 @@
 			<td>{{ person.email }}</td>
 		</tr>
 		<tr>
+			<td>CEP</td>
+			<td>{{ person.addr_cep }}</td>
+		</tr>
+		<tr>
+			<td>City / State</td>
+			<td>{{ person.addr_city }}/{{ person.addr_uf}}</td>
+		</tr>
+		<tr>
+			<td>Bairro</td>
+			<td>{{ person.addr_bairro }}</td>
+		</tr>
+		<tr>
+			<td>Rua</td>
+			<td>{{ person.addr_rua }}</td>
+		</tr>
+		<tr>
+			<td>Num</td>
+			<td>{{ person.addr_num }}</td>
+		</tr>
+		<tr>
+			<td>Compl</td>
+			<td>{{ person.addr_compl }}</td>
+		</tr>
+		<tr>
 			<td>Created by: </td>
 			<td>{{ person.user_id }}: {{ creator }}</td>
 		</tr>

@@ -6,10 +6,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    ITEMS_PER_PAGE = 50
-    CSV_FOLDER = os.path.abspath(os.path.join('app', 'csv')) # deprecate
     TEMPLATES_FOLDER = os.path.join('app', 'mailmerge', 'models')
     OUTPUT_FOLDER = os.path.join('mailmerge', 'output')
-    # Refers to mail merge templates, not jinja2 templates!
+    RE_FILES_FOLDER = os.path.join('app', 'realestate', 'files')
     MAX_CONTENT_LENGTH = 8 * 1024 * 1024 # 8 megabytes
-    

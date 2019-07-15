@@ -39,6 +39,9 @@ def create_app(config_class=Config):
     from app.mailmerge import bp as mailmerge_bp
     app.register_blueprint(mailmerge_bp)
 
+    from app.realestate import bp as realestate_bp
+    app.register_blueprint(realestate_bp)
+
     if not app.debug and not app.testing:
         if not os.path.exists('logs'):
             os.mkdir('logs')

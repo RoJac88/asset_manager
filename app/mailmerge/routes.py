@@ -15,11 +15,8 @@ from mailmerge import MailMerge
 @bp.route('/mailmerge', methods=['GET'])
 @login_required
 def mailmerge():
-    page = request.args.get('page', 1, type=int)
-    templates = TemplateDocx.query.paginate(page, current_app.config['ITEMS_PER_PAGE'], False)
-    next_url = url_for('mailmerge.mailmerge', page=templates.next_num) if templates.has_next else None
-    prev_url = url_for('mailmerge.mailmerge', page=templates.prev_num) if templates.has_prev else None
-    return render_template('mailmerge/mailmerge.html', templates=templates.items, next_url=next_url, prev_url=prev_url)
+    templates = TemplateDocx.query.all()
+    return render_template('mailmerge/mailmerge.html', templates=templates)
 
 @bp.route('/download/<filepath>', methods=['GET'])
 @login_required

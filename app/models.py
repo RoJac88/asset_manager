@@ -26,13 +26,34 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-class UserFile(db.Model):
+class File(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(32))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     file_path = db.Column(db.String(130))
     file_size = db.Column(db.Integer())
+    type = db.Column(db.String(12))
+
+    __mapper_args__ = {
+        'polymorphic_identity':'file',
+        'polymorphic_on':type
+    }
+
+class UserFile(File):
+    id = db.Column(db.Integer, db.ForeignKey('file.id'), primary_key=True)
+
+    __mapper_args__ = {
+        'polymorphic_identity':'user',
+    }
+
+class ImovelFile(File):
+    id = db.Column(db.Integer, db.ForeignKey('file.id'), primary_key=True)
+    imovel_id = db.Column(db.Integer, db.ForeignKey('imovel.id'))
+
+    __mapper_args__ = {
+        'polymorphic_identity':'im',
+    }
 
 class Person(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -72,8 +93,9 @@ class NaturalPerson(Person):
     }
 
     def asdict(self):
-        return {'name' : self.name,
-            'cpf' : person.cpf[:3]+'.'+person.cpf[3:6]+'.'+person.cpf[6:9]+'-'+person.cpf[9:],
+        return {
+            'name' : self.name,
+            'cpf' : self.cpf[:3]+'.'+self.cpf[3:6]+'.'+self.cpf[6:9]+'-'+self.cpf[9:],
             'rg' : str(self.rg),
             'email' : self.email,
             'addr_bairro': self.addr_bairro,
@@ -81,7 +103,8 @@ class NaturalPerson(Person):
             'addr_num': self.addr_num,
             'addr_cep': self.addr_cep,
             'addr_city': self.addr_city,
-            'addr_uf': self.addr_uf}
+            'addr_uf': self.addr_uf,
+            }
 
     @staticmethod
     def csv_editable():
@@ -111,7 +134,8 @@ class LegalPerson(Person):
 
     def asdict(self):
         mycode = LegalPCodes.query.get(self.code)
-        return {'name': self.legal_name,
+        return {
+            'name': self.legal_name,
             'cnpj': self.cnpj[:2]+'.'+self.cnpj[2:5]+'.'+self.cnpj[5:8]+'/'+self.cnpj[8:12]+'-'+self.cnpj[12:],
             'code': str(mycode),
             'email': self.email,
@@ -123,7 +147,8 @@ class LegalPerson(Person):
             'addr_uf': self.addr_uf,
             'legal_birth': str(self.legal_birth),
             'legal_death': str(self.legal_death),
-            'legal_status': self.legal_status }
+            'legal_status': self.legal_status,
+            }
 
 
 class LegalPCodes(db.Model):
@@ -158,15 +183,18 @@ class MergeField(db.Model):
 class Imovel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(24))
-    sql = db.Column(db.String(9))
+    sql = db.Column(db.String(9), index=True)
     addr_cep = db.Column(db.String(8), db.ForeignKey('cep.id'))
     addr_cidade = db.Column(db.String(24))
+    addr_uf = db.Column(db.String(2))
+    addr_bairro = db.Column(db.String(24))
     addr_rua = db.Column(db.String(64))
     addr_num = db.Column(db.String(5))
     addr_compl = db.Column(db.String(64))
     matricula_n = db.Column(db.String(6))
     matricula_file = db.Column(db.String(128))
     matricula_file_date = db.Column(db.DateTime, index=True, default=datetime(1889,11,15))
+    files = db.relationship('ImovelFile', backref='imovel', lazy='select', foreign_keys='ImovelFile.imovel_id')
 
 class Cep(db.Model):
     id = db.Column(db.String(8), primary_key=True)

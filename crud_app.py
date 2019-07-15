@@ -6,7 +6,7 @@ from app.models import User, Person, NaturalPerson, LegalPerson, Lawsuit, LegalP
 app = create_app()
 
 def populate_ceps():
-    dir = os.path.join('app', 'main', 'data')
+    dir = os.path.join('app', 'realestate', 'data')
     source = os.path.join(dir, 'ceps.csv')
     with open(source, encoding='utf-8-sig', newline='') as csvfile:
         print('CSV file located')
@@ -26,8 +26,7 @@ def populate_ceps():
             db.session.add(new_cep)
             print('OK!')
     db.session.commit()
-    print('CEPs:')
-    print(len(Cep.query.all()))
+    print('CEPs imported')
 
 def populate_legal_codes():
     dir = os.path.join('app', 'people', 'data')

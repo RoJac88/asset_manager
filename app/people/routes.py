@@ -1,6 +1,5 @@
 import os
 import csv
-import io
 
 from flask import render_template, flash, redirect, url_for, request, current_app
 from app import db
@@ -17,28 +16,42 @@ def add_person():
     form1 = AddNaturalPersonForm()
     form2 = AddLegalPersonFrom()
     if form1.validate_on_submit() and form1.submit.data:
-        user_id = current_user.id
-        name = form1.name.data.upper()
-        cpf = form1.cpf.data
-        rg = form1.rg.data
-        email = form1.email.data
-        new_person = NaturalPerson(name=name,cpf=cpf,rg=rg,user_id=user_id,
-            email=email,last_editor=user_id)
+        new_person = NaturalPerson()
+        new_person.user_id = current_user.id
+        new_person.last_editor = current_user.id
+        new_person.name = form1.name.data.upper()
+        new_person.cpf = form1.cpf.data
+        new_person.rg = form1.rg.data
+        new_person.email = form1.email.data
+        new_person.addr_cep = form1.addr_cep_nat.data
+        new_person.addr_city = form1.addr_city.data
+        new_person.addr_uf = form1.addr_uf.data
+        new_person.addr_bairro = form1.addr_bairro.data
+        new_person.addr_rua = form1.addr_rua.data
+        new_person.addr_num = form1.addr_num.data
+        new_person.addr_compl = form1.addr_compl.data
         db.session.add(new_person)
         db.session.commit()
-        flash('Added {} to the database!'.format(name))
+        flash('Added {} to the database!'.format(new_person.name))
         return redirect(url_for('main.index'))
     if form2.validate_on_submit() and form2.submit.data:
-        user_id = current_user.id
-        legal_name = form2.legal_name.data.upper()
-        cnpj = form2.cnpj.data
-        code = form2.code.data.id
-        email = form2.email.data
-        new_person = LegalPerson(legal_name=legal_name,cnpj=cnpj,code=code,user_id=user_id,
-            email=email,last_editor=user_id)
+        new_person = LegalPerson()
+        new_person.user_id = current_user.id
+        new_person.last_editor = current_user.id
+        new_person.legal_name = form2.legal_name.data.upper()
+        new_person.cnpj = form2.cnpj.data
+        new_person.code = form2.code.data.id
+        new_person.email = form2.email.data
+        new_person.addr_cep = form2.addr_cep_nat.data
+        new_person.addr_city = form2.addr_city.data
+        new_person.addr_uf = form2.addr_uf.data
+        new_person.addr_bairro = form2.addr_bairro.data
+        new_person.addr_rua = form2.addr_rua.data
+        new_person.addr_num = form2.addr_num.data
+        new_person.addr_compl = form2.addr_compl.data
         db.session.add(new_person)
         db.session.commit()
-        flash('Added {} to the database!'.format(legal_name))
+        flash('Added {} to the database!'.format(new_person.legal_name))
         return redirect(url_for('main.index'))
     return render_template('people/add_person.html', form1=form1, form2=form2)
 

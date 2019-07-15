@@ -3,4 +3,5 @@
 app.db
 app/mailmerge/models
 app/mailmerge/output
-.env 
+app/realestate/files
+.env

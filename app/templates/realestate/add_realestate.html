@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block scripts %}
+  {{ super() }}
+  <script>
+    $(function() {
+      $("#addr_cep").on('input', function() {
+        $.getJSON($SCRIPT_ROOT + '/cep', {
+          cep: $('input[name="addr_cep"]').val(),
+        }, function(data) {
+          $("[id='addr_cidade']").val(data["cidade"]);
+          $("[id='addr_uf']").val(data["uf"]);
+          $("[id='addr_bairro']").val(data["bairro"]);
+          $("[id='addr_rua']").val(data["rua"]);
+          $("[id='addr_num']").val(data["num"]);
+          $("[id='addr_compl']").val(data["compl"]);
+        });
+      });
+    });
+  </script>
+{% endblock %}
+
+{% block app_content %}
+  <div class="container">
+    <div class="row">
+      <h2>Add Real Estate</h2>
+      <form method="post" action="" role="form" enctype="multipart/form-data">
+        <div class="form-group">
+          {{ form.csrf_token }}
+        </div>
+        <div class="col-sm-6">
+          <fieldset class="info">
+            <legend class="info">Property Info</legend>
+              <div class="form-group">
+    				    {{ form.name.label(class="control-label") }}
+    						{{ form.name(class="form-control") }}
+              </div>
+              <div class="form-group">
+                {{ form.sql.label(class="control-label") }}
+    						{{ form.sql(class="form-control") }}
+              </div>
+              <div class="form-group">
+                {{ form.matricula_n.label(class="control-label") }}
+    						{{ form.matricula_n(class="form-control") }}
+              </div>
+              <div class="form-group">
+                {{ form.matricula_file.label(class="control-label") }}
+    						{{ form.matricula_file(class="form-control") }}
+              </div>
+          </fieldset>
+        </div>
+        <div class="col-sm-6">
+          <fieldset class="addr">
+            <legend class="addr">Address Details</legend>
+              <div class="form-group">
+                {{ form.addr_cep.label(class="control-label") }}
+                {{ form.addr_cep(class="form-control") }}
+              </div>
+              <div class="form-group form-inline row">
+                <div class="col-xs-6">
+                  {{ form.addr_cidade.label(class="control-label") }}
+                  {{ form.addr_cidade(class="form-control") }}
+                </div>
+                <div class="col-xs-3">
+                  {{ form.addr_uf.label(class="control-label") }}
+                  {{ form.addr_uf(class="form-control") }}
+                </div>
+              </div>
+              <div class="form-group">
+                {{ form.addr_bairro.label(class="control-label") }}
+                {{ form.addr_bairro(class="form-control") }}
+              </div>
+              <div class="form-group form-inline">
+                {{ form.addr_rua.label(class="control-label") }}
+                {{ form.addr_rua(class="form-control") }}
+                {{ form.addr_num.label(class="control-label") }}
+                {{ form.addr_num(class="form-control") }}
+              </div>
+              <div class="form-group">
+                {{ form.addr_compl.label(class="control-label") }}
+                {{ form.addr_compl(class="form-control") }}
+              </div>
+          </fieldset>
+        </div>
+        <div class ="form-group required">
+          {{ form.submit.label(class="sr-only") }}
+          {{ form.submit(class="form-control btn-success") }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
