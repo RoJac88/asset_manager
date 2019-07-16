@@ -71,6 +71,8 @@ def people():
 @bp.route('/person/<person_id>', methods=['GET', 'POST'])
 def person(person_id):
     current_person = Person.query.get(person_id)
+    if current_person == None:
+        return render_template('people/natural_person_view.html', person=current_person)
     if not current_user.is_authenticated and current_person.type == 'natural':
         return render_template('people/natural_person_view.html', person=current_person, creator=current_person.creator.username,
             editor=current_person.editor.username)

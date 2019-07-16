@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block app_content %}
+{% if imovel != None %}
   <div class="container">
     <div class="row">
       <div class="col-xs-5">
@@ -36,4 +37,7 @@
       </div>
     </div>
   </div>
+  {% else %}
+  <img src="http://www.quickmeme.com/img/a8/a8022006b463b5ed9be5a62f1bdbac43b4f3dbd5c6b3bb44707fe5f5e26635b0.jpg" class="img-responsive">
+  {% endif %}
 {% endblock %}
