@@ -39,7 +39,7 @@ def add_realestate():
         new_realestate = Imovel()
         file = form.matricula_file.data
         file_name = secure_filename('MAT_'+form.matricula_n.data+'SQL_'+form.sql.data+'.pdf')
-        file_path = os.path.join(target,file_name)
+        file_path = os.path.abspath(os.path.join(target,file_name))
         file.save(file_path)
         print('File saved: {}'.format(file_name))
         new_realestate.matricula_file = file_path

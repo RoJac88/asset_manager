@@ -1,7 +1,39 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-  {% if imovel != None %}
-  <p> View for Real Estate id = {{ imovel.id }} </p>
-  {% endif %}
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-5">
+        <div class="panel panel-default">
+        	<div class="panel-heading text-center"><h4>Real Estate Info</h4></div>
+        	<div class="panel-body">
+        		<p><strong>{{ imovel.name }}</strong></p>
+            <p>{{ imovel.addr_rua }}, {{ imovel.addr_num }} - {{ imovel.addr_compl }}</p>
+            <p>{{ imovel.addr_bairro }}</p>
+            <p>{{ imovel.addr_cidade }} - {{ imovel.addr_uf }}</p>
+            <p>{{ imovel.addr_cep[:-3] }}-{{ imovel.addr_cep[-3:] }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-7">
+        <p>Mapa</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="panel panel-default">
+        <div class="panel-heading text-center"><h4>Matricula: {{ imovel.matricula_n }}</h4></div>
+          <div class="panel-body">
+            <div class="col-xs-1">
+              <img src="{{ url_for('static', filename='pdf.png') }}" class="img-responsive" width=48 height=48>
+            </div>
+          <div class="col-xs-11">
+            <p>Data: {{ moment(imovel.matricula_file_date).format('LLLL') }}</p>
+            <a href="{{ url_for('main.download_file', filepath=imovel.matricula_file) }}">
+      				<button type="button" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-download-alt"></span> Download</button>
+      			</a>
+            <button type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-refresh"></span>Atualizar Matrícula</button>
+          </div>
+        </div>
+      </div>
+    </div>
 {% endblock %}

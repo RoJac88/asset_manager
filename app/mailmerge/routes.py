@@ -1,7 +1,7 @@
 import os
 import uuid
 
-from flask import render_template, flash, redirect, url_for, request, current_app, send_from_directory
+from flask import render_template, flash, redirect, url_for, request, current_app 
 from app import db
 from werkzeug.utils import secure_filename
 from flask_login import current_user, login_required
@@ -17,13 +17,6 @@ from mailmerge import MailMerge
 def mailmerge():
     templates = TemplateDocx.query.all()
     return render_template('mailmerge/mailmerge.html', templates=templates)
-
-@bp.route('/download/<filepath>', methods=['GET'])
-@login_required
-def download_file(filepath):
-    directory = os.path.dirname(filepath)
-    filename = os.path.basename(filepath)
-    return send_from_directory(directory, filename, as_attachment=True)
 
 @bp.route('/add_template', methods=['GET', 'POST'])
 @login_required

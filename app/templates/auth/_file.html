@@ -9,7 +9,7 @@
 		<h4>{{ file.name }}</h4>
 		<p>Created: {{ moment(file.timestamp).format('LLLL') }}</p>
 		<div class="row">
-			<a href="{{ url_for('mailmerge.download_file', filepath=file.file_path) }}">
+			<a href="{{ url_for('main.download_file', filepath=file.file_path) }}">
 				<button type="button" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-download-alt"></span> Download</button>
 			</a>
 			<a href="{{ url_for('mailmerge.delete_userfile', file_id=file.id) }}">
