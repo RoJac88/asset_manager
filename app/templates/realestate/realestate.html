@@ -12,11 +12,66 @@
 	</script>
 {% endblock %}
 
+{% block head %}
+	{{ super() }}
+	<style>
+		#bom {
+		  width: 24px;
+			height: 24px;
+			margin-bottom: 4px;
+		}
+		#csv {
+			background-color: snow;
+			padding-left: 8px;
+			padding-top: 4px;
+			padding-bottom: 4px;
+			margin-right: 14px;
+			border-style: inset;
+		}
+	</style>
+{% endblock %}
+
 {% block app_content %}
+{% if current_user.is_authenticated %}
+<div class="container">
+	<div class="well text-center"><h4>Real Estate Entries</h4></div>
+	<div class="row">
+		<div class="col-sm-3">
+			<a href="{{ url_for('realestate.add_realestate') }}">
+				<button type="button" class="btn btn-default btn-sm">
+		          <span class="glyphicon glyphicon-plus"></span> Insert Real Estate
+		        </button>
+			</a>
+				<button type="button" class="btn btn-default btn-sm" data-toggle="collapse" data-target="#csv">
+		          <span class="glyphicon glyphicon-open-file"></span> Import CSV
+		        </button>
+		</div>
+		<div class="col-sm-7">
+			<div class="collapse" id="csv">
+				<form method="post" action="" class="form-inline" role="form" enctype="multipart/form-data">
+					<div class = "form-group">
+				    {{ form.csrf_token }}
+				    {{ form.csv.label(class="control-label") }}
+						{{ form.csv(class="form-control") }}
+					</div>
+					<div class ="form-group">
+						{{ form.bom.label() }}
+						{{ form.bom(class="form-control") }}
+					</div>
+					<div class ="form-group required">
+						{{ form.submit.label(class="sr-only") }}
+						{{ form.submit(class="form-control btn-success") }}
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<br>
+{% endif %}
 
 {% if imoveis != [] %}
 <div class="container">
-	<div class="well text-center"><h4>Real Estate Entries</h4></div>
 	<table id="imoveis" class="display table table-striped table-hover table-condensed">
 		<thead>
 			<tr>

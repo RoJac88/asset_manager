@@ -1,8 +1,16 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DateField
+from wtforms import StringField, SubmitField, DateField, BooleanField
 from wtforms.validators import ValidationError, DataRequired, Optional, Email
 from app.models import Cep, Imovel
 from flask_wtf.file import FileField, FileRequired, FileAllowed
+
+class UploadCSVForm(FlaskForm):
+    csv = FileField('CSV (utf-8): ', validators=[
+        FileRequired(),
+        FileAllowed(['csv'], 'CSV flies only')
+    ])
+    bom = BooleanField('BOM mark: ')
+    submit = SubmitField('Upload')
 
 class ImovelForm(FlaskForm):
     name = StringField('Name')
@@ -16,7 +24,7 @@ class ImovelForm(FlaskForm):
     addr_compl = StringField('Compl')
     matricula_n = StringField('Matrícula')
     matricula_file = FileField('Matrícula (PDF): ', validators=[
-        FileRequired(),
+        Optional(),
         FileAllowed(['pdf'], 'PDF flies only')
     ])
     submit = SubmitField('Insert')

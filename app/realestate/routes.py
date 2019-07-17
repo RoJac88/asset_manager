@@ -3,7 +3,7 @@ import os
 from werkzeug.utils import secure_filename
 from flask import render_template, flash, redirect, url_for, request, current_app, jsonify
 from app import db
-from app.realestate.forms import ImovelForm
+from app.realestate.forms import ImovelForm, UploadCSVForm
 from flask_login import current_user, login_required
 from app.models import Imovel, Cep
 from datetime import datetime
@@ -21,8 +21,9 @@ def cep():
 
 @bp.route('/realestate', methods=['GET'])
 def realestate():
+    form = UploadCSVForm()
     imoveis = Imovel.query.all()
-    return render_template('realestate/realestate.html', imoveis=imoveis)
+    return render_template('realestate/realestate.html', imoveis=imoveis, form=form)
 
 @bp.route('/imovel/<imovel_id>', methods=['GET'])
 def imovel(imovel_id):
