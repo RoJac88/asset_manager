@@ -13,11 +13,14 @@ from app.realestate import bp
 @login_required
 def cep():
     cep_n = request.args.get('cep', '0')
-    cep = Cep.query.get(str(cep_n))
-    if cep:
-        return jsonify(cep.asdict())
-    else:
+    if len(str(cep_n)) != 8:
         return jsonify(error=404, text=str('404: CEP not found')), 404
+    else:
+        cep = Cep.query.get(str(cep_n))
+        if cep:
+            return jsonify(cep.asdict())
+        else:
+            return jsonify(error=404, text=str('404: CEP not found')), 404
 
 @bp.route('/realestate', methods=['GET'])
 def realestate():

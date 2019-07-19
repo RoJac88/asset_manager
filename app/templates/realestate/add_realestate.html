@@ -5,27 +5,90 @@
   {{ super() }}
   <script>
     $(function() {
+
+      $(".owner_id").on('input', function() {
+        if ($(this).val().length >= 11) {
+          var index = parseInt(this.id.split("-")[1], 10);
+          $.getJSON($SCRIPT_ROOT + '/_get_person', {
+            id: $(this).val(),
+          }, function(data) {
+            $('#info-'+index).val(data["name"]);
+          });
+        }
+      });
+
       $("#addr_cep").on('input', function() {
-        $.getJSON($SCRIPT_ROOT + '/cep', {
-          cep: $('input[name="addr_cep"]').val(),
-        }, function(data) {
-          $("[id='addr_cidade']").val(data["cidade"]);
-          $("[id='addr_uf']").val(data["uf"]);
-          $("[id='addr_bairro']").val(data["bairro"]);
-          $("[id='addr_rua']").val(data["rua"]);
-          $("[id='addr_num']").val(data["num"]);
-          $("[id='addr_compl']").val(data["compl"]);
+        if ($(this).val().length == 8) {
+          $.getJSON($SCRIPT_ROOT + '/cep', {
+            cep: $('input[name="addr_cep"]').val(),
+          }, function(data) {
+            $("[id='addr_cidade']").val(data["cidade"]);
+            $("[id='addr_uf']").val(data["uf"]);
+            $("[id='addr_bairro']").val(data["bairro"]);
+            $("[id='addr_rua']").val(data["rua"]);
+            $("[id='addr_num']").val(data["num"]);
+            $("[id='addr_compl']").val(data["compl"]);
+          });
+        }
+      });
+
+      $("#add_own").on('click', function() {
+        var $newOwner = $('.owner_form').last().clone();
+        var tags = $newOwner.children().prop("for").split("-");
+        var index = parseInt(tags[1], 10);
+        var next = index + 1;
+        if (($newOwner).find(".btn-danger").length == 0) {
+          var $inner = $("<span/>", {"class": "glyphicon glyphicon-trash"});
+          var $outter = $("<button/>", {"class": "btn btn-danger btn-sm form-control", "id": next});
+          $newOwner.append($outter.append($inner.append()))
+        } else {
+          $newOwner.find(".btn-danger").last().attr({id: next});
+        };
+        var ownerTag = "owners-"+index+"-owner";
+        var shareTag = "owners-"+index+"-share";
+        var ownerTagNext = "owners-"+next+"-owner";
+        var shareTagNext = "owners-"+next+"-share";
+        $($newOwner).find(".owner_id_label").last().attr("for", ownerTagNext);
+        $($newOwner).find(".owner_id").last().attr({
+          id: ownerTagNext,
+          name: ownerTagNext,
+          }).on('input', function() {
+            if ($(this).val().length >= 11) {
+              var index = parseInt(this.id.split("-")[1], 10);
+              $.getJSON($SCRIPT_ROOT + '/_get_person', {
+                id: $(this).val(),
+              }, function(data) {
+                $('#info-'+index).val(data["name"]);
+              });
+            }
+          });
+        $($newOwner).find(".owner_share_label").last().attr("for", shareTagNext);
+        $($newOwner).find(".owner_share").last().attr({
+          id: shareTagNext,
+          name: shareTagNext,
+          });
+        $($newOwner).find(".btn-danger").last().on('click', function() {
+          $(this).parent().remove();
+          $('#info-'+this.id).remove();
+          });
+        $newOwner.appendTo("#estate_owners");
+        $("#estate_owners").find("div").last().addClass("owner_id-"+next);
+        var $info = $("<input id=info-"+next+" class='form-control owner-info' style='height:39px' type='text' value='' disabled>");
+        var $divInfo = $('<div/>', {
+          "class": 'form-group from-inline owner-info-'+next,
+        });
+        $($info).appendTo($divInfo)
+        $divInfo.appendTo("#owners_info")
         });
       });
-    });
-  </script>
+    </script>
 {% endblock %}
 
 {% block app_content %}
   <div class="container">
-    <div class="row">
-      <h2>Add Real Estate</h2>
-      <form method="post" action="" role="form" enctype="multipart/form-data">
+    <form method="post" action="" role="form" enctype="multipart/form-data">
+      <div class="row">
+        <h2>Add Real Estate</h2>
         <div class="form-group">
           {{ form.csrf_token }}
         </div>
@@ -41,6 +104,10 @@
     						{{ form.sql(class="form-control") }}
               </div>
               <div class="form-group">
+                {{ form.shares.label(class="control-label") }}
+    						{{ form.shares(class="form-control") }}
+              </div>
+              <div class="form-group">
                 {{ form.matricula_n.label(class="control-label") }}
     						{{ form.matricula_n(class="form-control") }}
               </div>
@@ -53,41 +120,70 @@
         <div class="col-sm-6">
           <fieldset class="addr">
             <legend class="addr">Address Details</legend>
-              <div class="form-group">
-                {{ form.addr_cep.label(class="control-label") }}
-                {{ form.addr_cep(class="form-control") }}
+            <div class="form-group">
+              {{ form.addr_cep.label(class="control-label") }}
+              {{ form.addr_cep(class="form-control") }}
+            </div>
+            <div class="form-group row">
+              <div class="col-xs-10">
+                {{ form.addr_cidade.label(class="control-label") }}
+                {{ form.addr_cidade(class="form-control") }}
               </div>
-              <div class="form-group form-inline row">
-                <div class="col-xs-6">
-                  {{ form.addr_cidade.label(class="control-label") }}
-                  {{ form.addr_cidade(class="form-control") }}
-                </div>
-                <div class="col-xs-3">
-                  {{ form.addr_uf.label(class="control-label") }}
-                  {{ form.addr_uf(class="form-control") }}
-                </div>
+              <div class="col-xs-2">
+                {{ form.addr_uf.label(class="control-label") }}
+                {{ form.addr_uf(class="form-control") }}
               </div>
-              <div class="form-group">
-                {{ form.addr_bairro.label(class="control-label") }}
-                {{ form.addr_bairro(class="form-control") }}
-              </div>
-              <div class="form-group form-inline">
+            </div>
+            <div class="form-group">
+              {{ form.addr_bairro.label(class="control-label") }}
+              {{ form.addr_bairro(class="form-control") }}
+            </div>
+            <div class="form-group row">
+              <div class="col-xs-10">
                 {{ form.addr_rua.label(class="control-label") }}
                 {{ form.addr_rua(class="form-control") }}
+              </div>
+              <div class="col-xs-2">
                 {{ form.addr_num.label(class="control-label") }}
                 {{ form.addr_num(class="form-control") }}
               </div>
-              <div class="form-group">
-                {{ form.addr_compl.label(class="control-label") }}
-                {{ form.addr_compl(class="form-control") }}
-              </div>
+            </div>
+            <div class="form-group">
+              {{ form.addr_compl.label(class="control-label") }}
+              {{ form.addr_compl(class="form-control") }}
+            </div>
           </fieldset>
         </div>
-        <div class ="form-group required">
+      </div>
+      <div class="row">
+        <div class="col-xs-6">
+          <fieldset id ="estate_owners">
+            <legend>Owners <button type="button" class="btn btn-primary btn-sm pull-right" id="add_own"><span class="glyphicon glyphicon-plus"></span> Add Owner</button></legend>
+            {% for l in form.owners %}
+            <div class ="form-group form-inline owner_form">
+              {{ l.owner.label(class_='owner_id_label form-control') }}
+              {{ l.owner(class_='form-control') }}
+              {{ l.share.label(class_='owner_share_label form-control') }}
+              {{ l.share(class_='form-control') }}
+            </div>
+            {% endfor %}
+          </fieldset>
+        </div>
+        <div class="col-xs-6">
+          <fieldset id ="owners_info">
+            <legend>Info</legend>
+            <div class ="form-group owner-info-0">
+              <input id="info-0" class="form-control owner-info" type="text" value="" style="height:39px" disabled>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
           {{ form.submit.label(class="sr-only") }}
           {{ form.submit(class="form-control btn-success") }}
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
   </div>
 {% endblock %}

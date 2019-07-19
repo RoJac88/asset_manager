@@ -1,7 +1,7 @@
 import os
 import csv
 
-from flask import render_template, flash, redirect, url_for, request, current_app
+from flask import render_template, flash, redirect, url_for, request, current_app, jsonify
 from app import db
 from app.people.forms import AddLegalPersonFrom, AddNaturalPersonForm, EditNaturalPersonForm, EditLegalPersonForm, UploadCSVForm
 from flask_login import current_user, login_required
@@ -9,6 +9,25 @@ from app.models import User, Person, NaturalPerson, LegalPerson
 from app.people.helpers import import_csv
 from datetime import datetime
 from app.people import bp
+
+@bp.route('/_get_person')
+@login_required
+def _get_person():
+    _n = str(request.args.get('id', '0'))
+    if len(_n) == 11:
+        person = NaturalPerson.query.filter_by(cpf=_n).first()
+        if person:
+            return jsonify(person.asdict())
+        else:
+            return jsonify(error=404, text=str('404: CPF not found')), 404
+    elif len(_n) == 14:
+        person = LegalPerson.query.filter_by(cnpj=_n).first()
+        if person:
+            return jsonify(person.asdict())
+        else:
+            return jsonify(error=404, text=str('404: CNPJ not found')), 404
+    else:
+        return jsonify(error=404, text=str('404: entry not found')), 404
 
 @bp.route('/add_person', methods=['GET', 'POST'])
 @login_required
