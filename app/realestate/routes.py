@@ -80,7 +80,7 @@ def add_realestate():
             person_has_estate = PersonImovel(person=owner, estate=new_realestate, shares=share)
             db.session.add(person_has_estate)
         db.session.commit()
-        flash('Added {} to the database!'.format(new_realestate.name))
+        flash('Added {} to the database!'.format(new_realestate.name), 'success')
         return redirect(url_for('realestate.realestate'))
     if form.errors: print(form.errors)
     return render_template('realestate/add_realestate.html', form=form)
@@ -90,11 +90,11 @@ def add_realestate():
 def delete_imovel(imovel_id):
     imovel = Imovel.query.get(imovel_id)
     if not imovel:
-        flash('Cannot delete non existent record')
+        flash('Cannot delete non existent record', 'danger')
         return redirect(url_for('realestate.realestate'))
     if imovel.matricula_file and os.path.isfile(imovel.matricula_file):
         os.remove(imovel.matricula_file)
     db.session.delete(imovel)
     db.session.commit()
-    flash('Record deleted: {}'.format(imovel))
+    flash('Record deleted: {}'.format(imovel), 'success')
     return redirect(url_for('realestate.realestate'))

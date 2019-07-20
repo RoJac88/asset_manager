@@ -1,7 +1,7 @@
 import os
 import uuid
 
-from flask import render_template, flash, redirect, url_for, request, current_app 
+from flask import render_template, flash, redirect, url_for, request, current_app
 from app import db
 from werkzeug.utils import secure_filename
 from flask_login import current_user, login_required
@@ -49,7 +49,7 @@ def add_template():
             db.session.add(new_f)
             db.session.commit()
             print('Added <{}> field for template: {}'.format(field,name))
-        flash('Template {} added. Detected {} merge fields'.format(name, len(fields)))
+        flash('Template {} added. Detected {} merge fields'.format(name, len(fields)), 'info')
         return redirect(url_for('mailmerge.mailmerge'))
     return render_template('mailmerge/add_docx.html', form=form)
 
@@ -77,7 +77,7 @@ def template(template_id):
             current_template.docs_generated += n
             db.session.add(new_file)
             db.session.commit()
-            flash('Merge successful!\nFile: {}'.format(file_label))
+            flash('Merge successful!\nFile: {}'.format(file_label), 'success')
         return redirect(url_for('auth.profile'))
     return render_template('mailmerge/template_view.html', template=current_template, fields=fields, form=form)
 
@@ -86,11 +86,11 @@ def template(template_id):
 def delete_userfile(file_id):
     file = UserFile.query.get(file_id)
     if not file:
-        flash('File does not exist')
+        flash('File does not exist', 'warning')
         return redirect(url_for('auth.profile'))
     os.remove(file.file_path)
     print('File {} removed by {}'.format(file.file_path, current_user))
     db.session.delete(file)
     db.session.commit()
-    flash('File deleted: {}'.format(file.name))
+    flash('File deleted: {}'.format(file.name), 'success')
     return redirect(url_for('auth.profile'))
