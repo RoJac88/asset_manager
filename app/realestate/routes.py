@@ -9,6 +9,15 @@ from app.models import Imovel, Cep, PersonImovel, NaturalPerson, LegalPerson, Pe
 from datetime import datetime
 from app.realestate import bp
 
+def info_fields(im_dict):
+    fields = []
+    for key in im_dict.keys():
+        _txt = key.split('-')
+        if 'owner' in _txt and 'owners' in _txt:
+            fields.append(_txt[1])
+    if fields == []: return [0]
+    else: return fields
+
 @bp.route('/cep')
 @login_required
 def cep():
@@ -46,6 +55,7 @@ def imovel(imovel_id):
 @login_required
 def add_realestate():
     form = ImovelForm()
+    fields = info_fields(request.form)
     target = current_app.config['RE_FILES_FOLDER']
     if form.validate_on_submit() and form.submit.data:
         if not os.path.exists(target): os.makedirs(target)
@@ -83,7 +93,7 @@ def add_realestate():
         flash('Added {} to the database!'.format(new_realestate.name), 'success')
         return redirect(url_for('realestate.realestate'))
     if form.errors: print(form.errors)
-    return render_template('realestate/add_realestate.html', form=form)
+    return render_template('realestate/add_realestate.html', form=form, fields=fields)
 
 @bp.route('/imovel/<imovel_id>/delete', methods=['GET'])
 @login_required
