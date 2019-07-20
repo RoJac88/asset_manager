@@ -143,8 +143,8 @@ def person(person_id):
         form.addr_num.data = current_person.addr_num
         form.addr_uf.data = current_person.addr_uf
         form.addr_city.data = current_person.addr_city
-        return render_template('people/natural_person_edit.html', person=current_person, form=form, creator=current_person.creator.username,
-            editor=current_person.editor.username)
+        return render_template('people/natural_person_edit.html', person=current_person,
+            form=form, creator=current_person.creator.username, editor=current_person.editor.username)
     elif current_person.type == 'legal':
         form.legal_name.data = current_person.legal_name
         form.code.data = current_person.category
@@ -158,8 +158,8 @@ def person(person_id):
         form.legal_status.data = current_person.legal_status
         form.legal_birth.data = current_person.legal_birth
         form.legal_death.data = current_person.legal_death
-        return render_template('people/legal_person_edit.html', person=current_person, form=form, creator=current_person.creator.username,
-            editor=current_person.editor.username)
+        return render_template('people/legal_person_edit.html', person=current_person,
+            form=form, creator=current_person.creator.username, editor=current_person.editor.username)
 
 @bp.route('/person/<person_id>/delete', methods=['GET'])
 @login_required
