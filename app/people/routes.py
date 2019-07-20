@@ -169,6 +169,10 @@ def delete_person(person_id):
     if not person:
         flash('Cannot delete non existent record', 'danger')
         return redirect(url_for('people.people'))
+    ownerships = PersonImovel.query.filter_by(person_id=person.id).all()
+    if ownerships:
+        for own in ownerships:
+            db.session.delete(own)
     db.session.delete(person)
     db.session.commit()
     flash('Record deleted: {}'.format(_p_repr), 'success')

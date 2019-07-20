@@ -102,9 +102,14 @@ def delete_imovel(imovel_id):
     if not imovel:
         flash('Cannot delete non existent record', 'danger')
         return redirect(url_for('realestate.realestate'))
-    if imovel.matricula_file and os.path.isfile(imovel.matricula_file):
-        os.remove(imovel.matricula_file)
-    db.session.delete(imovel)
-    db.session.commit()
-    flash('Record deleted: {}'.format(imovel), 'success')
-    return redirect(url_for('realestate.realestate'))
+    else:
+        if imovel.matricula_file and os.path.isfile(imovel.matricula_file):
+            os.remove(imovel.matricula_file)
+        ownerships = PersonImovel.query.filter_by(imovel_id=imovel.id).all()
+        if ownerships:
+            for own in ownerships:
+                db.session.delete(own)
+        db.session.delete(imovel)
+        db.session.commit()
+        flash('Record deleted: {}'.format(imovel), 'success')
+        return redirect(url_for('realestate.realestate'))
