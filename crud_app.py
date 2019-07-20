@@ -1,7 +1,7 @@
 import os
 import csv
 from app import create_app, db
-from app.models import User, Person, NaturalPerson, LegalPerson, Lawsuit, LegalPCodes, TemplateDocx, MergeField, UserFile, Cep
+from app.models import User, Person, NaturalPerson, LegalPerson, Lawsuit, LegalPCodes, TemplateDocx, MergeField, UserFile, Cep, Imovel, PersonImovel
 
 app = create_app()
 
@@ -122,4 +122,5 @@ def make_shell_context():
         'TemplateDocx': TemplateDocx, 'MergeField': MergeField, 'cf': clear_files,
         'populate_legal_codes': populate_legal_codes, 'clear_legal_codes' : clear_legal_codes,
         'print_codes': print_codes, 'pop': populate_legal_codes, 'UserFile': UserFile, 'cm': clear_mergemail,
-        'clear_persons' : clear_persons, 'ceps' : populate_ceps}
+        'clear_persons' : clear_persons, 'ceps' : populate_ceps, 'Imovel': Imovel,
+        'PersonImovel': PersonImovel, }

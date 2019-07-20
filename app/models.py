@@ -1,3 +1,5 @@
+from sqlalchemy.orm import backref
+from sqlalchemy.ext.associationproxy import association_proxy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from app import db, login
@@ -72,12 +74,28 @@ class Person(db.Model):
     type = db.Column(db.String(12))
     lawsuits_plaintiff = db.relationship('Lawsuit', backref='active', lazy='dynamic', foreign_keys='Lawsuit.plaintiff')
     lawsuits_defendant = db.relationship('Lawsuit', backref='passive', lazy='dynamic', foreign_keys='Lawsuit.defendant')
+    estate_ownership = association_proxy('person_imovel', 'imovel')
 
     __mapper_args__ = {
         'polymorphic_identity':'person',
         'polymorphic_on':type
     }
 
+class PersonImovel(db.Model):
+    __tablename__ = 'person_imovel'
+    person_id = db.Column(db.Integer, db.ForeignKey('person.id'), primary_key=True)
+    imovel_id = db.Column(db.Integer, db.ForeignKey('imovel.id'), primary_key=True)
+    shares = db.Column(db.Integer)
+
+    person = db.relationship(Person,
+        backref=backref("estate_ownership", cascade="all, delete-orphan"))
+
+    estate = db.relationship("Imovel")
+
+    def __init__(self, person=None, estate=None, shares=None):
+        self.person = person
+        self.estate = estate
+        self.shares = shares
 
 class NaturalPerson(Person):
     id = db.Column(db.Integer, db.ForeignKey('person.id'), primary_key=True)
@@ -194,6 +212,7 @@ class Imovel(db.Model):
     matricula_n = db.Column(db.String(6))
     matricula_file = db.Column(db.String(128))
     matricula_file_date = db.Column(db.DateTime, index=True, default=datetime(1889,11,15))
+    total_shares = db.Column(db.Integer)
     files = db.relationship('ImovelFile', backref='imovel', lazy='select', foreign_keys='ImovelFile.imovel_id')
 
 class Cep(db.Model):
