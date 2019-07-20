@@ -70,7 +70,7 @@ def add_person():
         new_person.addr_compl = form2.addr_compl.data
         db.session.add(new_person)
         db.session.commit()
-        flash('Added {} to the database!'.format(new_person.legal_name), 'sucess')
+        flash('Added {} to the database!'.format(new_person.legal_name), 'info')
         return redirect(url_for('main.index'))
     return render_template('people/add_person.html', form1=form1, form2=form2)
 
@@ -82,7 +82,7 @@ def people():
         f = request.files['csv']
         added = import_csv(f, form.bom.data)
         db.session.commit()
-        flash('Added {} entries to the database'.format(added), 'sucess')
+        flash('Added {} entries to the database'.format(added), 'info')
         return redirect(url_for('people.people'))
     print(form.errors)
     return render_template('people/people.html', people=people, form=form)
@@ -113,7 +113,7 @@ def person(person_id):
         current_person.last_editor = current_user.id
         current_person.last_edit_time = datetime.utcnow()
         db.session.commit()
-        flash('Your changes have been saved', 'info')
+        flash('Your changes have been saved', 'success')
         return redirect(url_for('people.people'))
     elif form.validate_on_submit() and current_person.type == 'legal':
         current_person.legal_name = form.legal_name.data.upper()
@@ -131,7 +131,7 @@ def person(person_id):
         current_person.last_editor = current_user.id
         current_person.last_edit_time = datetime.utcnow()
         db.session.commit()
-        flash('Your changes have been saved', 'info')
+        flash('Your changes have been saved', 'success')
         return redirect(url_for('people.people'))
     elif request.method == 'GET' and current_person.type == 'natural':
         form.name.data = current_person.name

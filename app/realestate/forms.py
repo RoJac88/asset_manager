@@ -39,7 +39,7 @@ class ImovelForm(FlaskForm):
     def validate_addr_cep(self, addr_cep):
         if Cep.query.get(addr_cep.data) == None:
             error = 'Invalid CEP'
-            flash(error)
+            flash(error, 'danger')
             raise ValidationError(error)
 
     def validate_owners(self, owners):
@@ -50,23 +50,23 @@ class ImovelForm(FlaskForm):
             share = item.data['share']
             if share is None or share == 0:
                 error = 'Shares must be non zero'
-                flash(error)
+                flash(error, 'danger')
                 raise ValidationError(error)
             if n in owner_set:
                 error = 'Only one line per owner'
-                flash(error)
+                flash(error, 'danger')
                 raise ValidationError(error)
             else:
                 owner_set.add(n)
             if len(n)!=11 and len(n)!=14:
                 error = 'Invalid length for CPF / CNPJ'
-                flash(error)
+                flash(error, 'danger')
                 raise ValidationError(error)
             if len(n)==11 and NaturalPerson.query.filter_by(cpf=n).first()==None:
                 error = 'CPF not found'
-                flash(error)
+                flash(error, 'danger')
                 raise ValidationError(error)
             if len(n)==14 and LegalPerson.query.filter_by(cnpj=n).first()==None:
                 error = 'CNPJ not found'
-                flash(error)
+                flash(error, 'danger')
                 raise ValidationError(error)
