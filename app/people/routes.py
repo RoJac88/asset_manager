@@ -5,7 +5,7 @@ from flask import render_template, flash, redirect, url_for, request, current_ap
 from app import db
 from app.people.forms import AddLegalPersonFrom, AddNaturalPersonForm, EditNaturalPersonForm, EditLegalPersonForm, UploadCSVForm
 from flask_login import current_user, login_required
-from app.models import User, Person, NaturalPerson, LegalPerson
+from app.models import User, Person, NaturalPerson, LegalPerson, PersonImovel
 from app.people.helpers import import_csv
 from datetime import datetime
 from app.people import bp
