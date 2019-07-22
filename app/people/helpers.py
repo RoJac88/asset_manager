@@ -18,6 +18,10 @@ def get_date(dt_string):
         return date
     except: ValueError
     try:
+        date = datetime.strptime(dt_string, "%Y/%m/%d")
+        return date
+    except: ValueError
+    try:
         date = datetime.strptime(dt_string, "%d/%m/%Y")
         return date
     except: ValueError

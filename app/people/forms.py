@@ -4,6 +4,7 @@ from wtforms import StringField, SubmitField, BooleanField, DateField
 from wtforms.validators import ValidationError, DataRequired, Optional, Email
 from app.models import NaturalPerson, LegalPCodes, Cep
 from flask_wtf.file import FileField, FileRequired, FileAllowed
+from datetime import datetime
 
 class UploadCSVForm(FlaskForm):
     csv = FileField('CSV (utf-8): ', validators=[
@@ -13,38 +14,33 @@ class UploadCSVForm(FlaskForm):
     bom = BooleanField('BOM mark: ')
     submit = SubmitField('Upload')
 
-class EditNaturalPersonForm(FlaskForm):
-    name = StringField('Name')
-    rg = StringField('RG', validators=[Optional()])
-    email = StringField('Email', validators=[Optional(), Email()])
-    addr_cep_nat = StringField('CEP', render_kw={'maxlength': 8})
+class EditContactForm(FlaskForm):
+    addr_cep = StringField('CEP', render_kw={'maxlength': 8})
     addr_city = StringField('City', validators=[Optional()])
     addr_uf = StringField('UF', validators=[Optional()], render_kw={'maxlength': 2})
     addr_bairro = StringField('Bairro', validators=[Optional()])
     addr_rua = StringField('Rua', validators=[Optional()])
     addr_num = StringField('N.', validators=[Optional()])
     addr_compl = StringField('Compl', validators=[Optional()])
+    email = StringField('Email', validators=[Optional(), Email()])
+    submit = SubmitField('Update')
+
+    def validate_addr_cep(self, addr_cep):
+        if Cep.query.get(addr_cep.data) == None:
+            raise ValidationError('Invalid CEP')
+
+class EditNaturalPersonForm(FlaskForm):
+    name = StringField('Name')
+    rg = StringField('RG', validators=[Optional()])
     submit = SubmitField('Update')
 
     def validate_rg(self, rg):
         if len(rg.data) > 11: raise ValidationError('Invalid RG')
 
-    def validate_addr_cep_nat(self, addr_cep):
-        if Cep.query.get(addr_cep.data) == None:
-            raise ValidationError('Invalid CEP')
-
 class EditLegalPersonForm(FlaskForm):
     legal_name = StringField('Legal Name')
     code = QuerySelectField('Code',
-        query_factory=lambda: LegalPCodes.query, allow_blank=False)
-    email = StringField('Email', validators=[Optional(), Email()])
-    addr_cep_leg = StringField('CEP', render_kw={'maxlength': 8})
-    addr_city = StringField('City', validators=[Optional()])
-    addr_uf = StringField('UF', validators=[Optional()], render_kw={'maxlength': 2})
-    addr_bairro = StringField('Bairro', validators=[Optional()])
-    addr_rua = StringField('Rua', validators=[Optional()])
-    addr_num = StringField('N.', validators=[Optional()])
-    addr_compl = StringField('Compl', validators=[Optional()])
+        query_factory=lambda: LegalPCodes.query.all(), allow_blank=False)
     legal_birth = DateField(validators=[Optional()])
     legal_death = DateField(validators=[Optional()])
     legal_status = StringField(validators=[Optional()])
@@ -55,10 +51,6 @@ class EditLegalPersonForm(FlaskForm):
             raise ValidationError('CNPJ must contain only digits')
         if len(cnpj.data) != 14:
             raise ValidationError('Invalid CNPJ number')
-
-    def validate_addr_cep_leg(self, addr_cep):
-        if Cep.query.get(addr_cep.data) == None:
-            raise ValidationError('Invalid CEP')
 
 class AddLegalPersonFrom(FlaskForm):
     legal_name = StringField('Legal Name', validators=[DataRequired()])

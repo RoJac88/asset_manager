@@ -20,7 +20,7 @@ class User(UserMixin, db.Model):
     templates_added = db.relationship('TemplateDocx', backref='author', lazy='dynamic', foreign_keys='TemplateDocx.user_id')
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)
+        return self.username
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -114,6 +114,7 @@ class NaturalPerson(Person):
         return {
             'name' : self.name,
             'cpf' : self.cpf[:3]+'.'+self.cpf[3:6]+'.'+self.cpf[6:9]+'-'+self.cpf[9:],
+            'sic' : self.cpf[:3]+'.'+self.cpf[3:6]+'.'+self.cpf[6:9]+'-'+self.cpf[9:],
             'rg' : str(self.rg),
             'email' : self.email,
             'addr_bairro': self.addr_bairro,
@@ -155,6 +156,7 @@ class LegalPerson(Person):
         return {
             'name': self.legal_name,
             'cnpj': self.cnpj[:2]+'.'+self.cnpj[2:5]+'.'+self.cnpj[5:8]+'/'+self.cnpj[8:12]+'-'+self.cnpj[12:],
+            'sic': self.cnpj[:2]+'.'+self.cnpj[2:5]+'.'+self.cnpj[5:8]+'/'+self.cnpj[8:12]+'-'+self.cnpj[12:],
             'code': str(mycode),
             'email': self.email,
             'addr_bairro': self.addr_bairro,
@@ -178,7 +180,7 @@ class LegalPCodes(db.Model):
     legal_persons = db.relationship('LegalPerson', backref='category', lazy='select', foreign_keys='LegalPerson.code')
 
     def __repr__(self):
-        return '{} : {}'.format(self.code_string, self.description)
+        return '{} - {}'.format(self.code_string, self.description)
 
 class TemplateDocx(db.Model):
     __tablename__ = 'template_docx'

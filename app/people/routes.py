@@ -3,9 +3,9 @@ import csv
 
 from flask import render_template, flash, redirect, url_for, request, current_app, jsonify
 from app import db
-from app.people.forms import AddLegalPersonFrom, AddNaturalPersonForm, EditNaturalPersonForm, EditLegalPersonForm, UploadCSVForm
+from app.people.forms import AddLegalPersonFrom, AddNaturalPersonForm, EditNaturalPersonForm, EditLegalPersonForm, UploadCSVForm, EditContactForm
 from flask_login import current_user, login_required
-from app.models import User, Person, NaturalPerson, LegalPerson, PersonImovel
+from app.models import User, Person, NaturalPerson, LegalPerson, PersonImovel, Imovel, LegalPCodes
 from app.people.helpers import import_csv
 from datetime import datetime
 from app.people import bp
@@ -61,7 +61,7 @@ def add_person():
         new_person.cnpj = form2.cnpj.data
         new_person.code = form2.code.data.id
         new_person.email = form2.email.data
-        new_person.addr_cep = form2.addr_cep_nat.data
+        new_person.addr_cep = form2.addr_cep_leg.data
         new_person.addr_city = form2.addr_city.data
         new_person.addr_uf = form2.addr_uf.data
         new_person.addr_bairro = form2.addr_bairro.data
@@ -87,83 +87,67 @@ def people():
     print(form.errors)
     return render_template('people/people.html', people=people, form=form)
 
-@bp.route('/person/<person_id>', methods=['GET', 'POST'])
-def person(person_id):
+@bp.route('/person', methods=['GET', 'POST'])
+def person():
+    person_id = request.args.get('person_id')
     current_person = Person.query.get(person_id)
-    if current_person == None:
-        return render_template('people/natural_person_view.html', person=current_person)
-    if not current_user.is_authenticated and current_person.type == 'natural':
-        return render_template('people/natural_person_view.html', person=current_person, creator=current_person.creator.username,
-            editor=current_person.editor.username)
-    if not current_user.is_authenticated and current_person.type == 'legal':
-        return render_template('people/legal_person_view.html', person=current_person, creator=current_person.creator.username,
-            editor=current_person.editor.username)
-    forms = {'legal': EditLegalPersonForm(), 'natural': EditNaturalPersonForm()}
-    form = forms[current_person.type]
+    form = None
+    contact_form = EditContactForm()
+    print(contact_form.errors)
+    template = 'people/natural_person_view.html'
+    if current_person:
+        forms = {'legal': EditLegalPersonForm(), 'natural': EditNaturalPersonForm()}
+        templates = {'legal': 'people/legal_person_view.html', 'natural': 'people/natural_person_view.html'}
+        form = forms[current_person.type]
+        template = templates[current_person.type]
+    _assets = PersonImovel.query.filter_by(person_id=current_person.id)
+    assets = []
+    for item in _assets:
+        asset = Imovel.query.get(item.imovel_id)
+        share = item.shares
+        assets.append((asset, share))
+    if contact_form.validate_on_submit():
+        current_person.email = contact_form.email.data
+        current_person.addr_cep = contact_form.addr_cep.data
+        current_person.addr_city = contact_form.addr_city.data
+        current_person.addr_uf = contact_form.addr_uf.data
+        current_person.addr_bairro = contact_form.addr_bairro.data
+        current_person.addr_rua = contact_form.addr_rua.data
+        current_person.addr_num = contact_form.addr_num.data
+        current_person.addr_compl = contact_form.addr_compl.data
+        current_person.last_editor = current_user.id
+        current_person.last_edit_time = datetime.utcnow()
+        db.session.commit()
+        flash('Contact details updated', 'success')
+        return redirect(url_for('people.person', person_id=current_person.id))
+    if form.validate_on_submit() and current_person.type == 'legal':
+        current_person.legal_name = form.legal_name.data.upper()
+        current_person.code = form.code.data.id
+        if form.legal_birth.data:
+            current_person.legal_birth = form.legal_birth.data
+        if form.legal_death.data:
+            current_person.legal_death =form.legal_death.data
+        current_person.legal_status = form.legal_status.data
+        current_person.last_editor = current_user.id
+        current_person.last_edit_time = datetime.utcnow()
+        db.session.commit()
+        flash('Legal person details updated', 'success')
+        return redirect(url_for('people.person', person_id=current_person.id))
     if form.validate_on_submit() and current_person.type == 'natural':
         current_person.name = form.name.data.upper()
         current_person.rg = form.rg.data
-        current_person.email = form.email.data
-        current_person.addr_cep = form.addr_cep_nat.data
-        current_person.addr_bairro = form.addr_bairro.data
-        current_person.addr_rua = form.addr_rua.data
-        current_person.addr_num = form.addr_num.data
-        current_person.addr_uf = form.addr_uf.data
-        current_person.addr_city = form.addr_city.data
         current_person.last_editor = current_user.id
         current_person.last_edit_time = datetime.utcnow()
         db.session.commit()
-        flash('Your changes have been saved', 'success')
-        return redirect(url_for('people.people'))
-    elif form.validate_on_submit() and current_person.type == 'legal':
-        current_person.legal_name = form.legal_name.data.upper()
-        current_person.code = form.code.data.id
-        current_person.email = form.email.data
-        current_person.addr_cep = form.addr_cep_leg.data
-        current_person.addr_bairro = form.addr_bairro.data
-        current_person.addr_rua = form.addr_rua.data
-        current_person.addr_num = form.addr_num.data
-        current_person.addr_uf = form.addr_uf.data
-        current_person.addr_city = form.addr_city.data
-        current_person.legal_status = form.legal_status.data
-        current_person.legal_birth = form.legal_birth.data
-        current_person.legal_death = form.legal_death.data
-        current_person.last_editor = current_user.id
-        current_person.last_edit_time = datetime.utcnow()
-        db.session.commit()
-        flash('Your changes have been saved', 'success')
-        return redirect(url_for('people.people'))
-    elif request.method == 'GET' and current_person.type == 'natural':
-        form.name.data = current_person.name
-        form.rg.data = current_person.rg
-        form.email.data = current_person.email
-        form.addr_cep_nat.data = current_person.addr_cep
-        form.addr_bairro.data = current_person.addr_bairro
-        form.addr_rua.data = current_person.addr_rua
-        form.addr_num.data = current_person.addr_num
-        form.addr_uf.data = current_person.addr_uf
-        form.addr_city.data = current_person.addr_city
-        return render_template('people/natural_person_edit.html', person=current_person,
-            form=form, creator=current_person.creator.username, editor=current_person.editor.username)
-    elif current_person.type == 'legal':
-        form.legal_name.data = current_person.legal_name
-        form.code.data = current_person.category
-        form.email.data = current_person.email
-        form.addr_cep_leg.data = current_person.addr_cep
-        form.addr_bairro.data = current_person.addr_bairro
-        form.addr_rua.data = current_person.addr_rua
-        form.addr_num.data = current_person.addr_num
-        form.addr_uf.data = current_person.addr_uf
-        form.addr_city.data = current_person.addr_city
-        form.legal_status.data = current_person.legal_status
-        form.legal_birth.data = current_person.legal_birth
-        form.legal_death.data = current_person.legal_death
-        return render_template('people/legal_person_edit.html', person=current_person,
-            form=form, creator=current_person.creator.username, editor=current_person.editor.username)
+        flash('Natural person details updated', 'success')
+        return redirect(url_for('people.person', person_id=current_person.id))
+    return render_template(template, person=current_person, form=form, assets=assets,
+        contact_form=contact_form)
 
-@bp.route('/person/<person_id>/delete', methods=['GET'])
+@bp.route('/person/delete', methods=['GET'])
 @login_required
-def delete_person(person_id):
+def delete_person():
+    person_id = request.args.get('person_id')
     person = Person.query.get(person_id)
     _p_repr = person.__repr__()
     if not person:

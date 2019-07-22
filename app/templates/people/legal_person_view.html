@@ -1,93 +1,192 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+  {{ super() }}
+  <script>
+    $(function() {
+      $("#addr_cep").on('input', function() {
+        if ($(this).val().length == 8) {
+          $.getJSON($SCRIPT_ROOT + '/cep', {
+            cep: $('input[name="addr_cep"]').val(),
+          }, function(data) {
+            $("[id='addr_cidade']").val(data["cidade"]);
+            $("[id='addr_uf']").val(data["uf"]);
+            $("[id='addr_bairro']").val(data["bairro"]);
+            $("[id='addr_rua']").val(data["rua"]);
+            $("[id='addr_num']").val(data["num"]);
+            $("[id='addr_compl']").val(data["compl"]);
+          });
+        }
+      });
+      var selected = $("select").attr('id');
+      $("select").val(selected);
+    });
+  </script>
+{% endblock %}
+
 {% block app_content %}
-	{% if person != None %}
-	<div class="container">
-		<h1>Person Details</h1>
-		<table class="table table-striped table-responsive">
-			<tr>
-				<th>Attribute</th>
-				<th>Value</th>
-			</tr>
-			<tr>
-				<td>Type</td>
-				<td>{{ person.type }}</td>
-			</tr>
-			<tr>
-				<td>ID</td>
-				<td>{{ person.id }}</td>
-			</tr>
-			<tr>
-				<td>Name</td>
-				<td>{{ person.legal_name }}</td>
-			</tr>
-			<tr>
-				<td>CNPJ</td>
-				<td>{{ person.cnpj[:2]+'.'+person.cnpj[2:5]+'.'+person.cnpj[5:8]+'/'+person.cnpj[8:12]+'-'+person.cnpj[12:] }}</td>
-			</tr>
-			<tr>
-				<td>Code (Natureza Jurídica)</td>
-				<td>{{ person.category }}</td>
-			</tr>
-			<tr>
-				<td>email</td>
-				<td>{{ person.email }}</td>
-			</tr>
-			<tr>
-				<td>Bairro</td>
-				<td>{{ person.addr_bairro }}</td>
-			</tr>
-			<tr>
-				<td>Rua</td>
-				<td>{{ person.addr_rua }}</td>
-			</tr>
-			<tr>
-				<td>Número</td>
-				<td>{{ person.addr_num }}</td>
-			</tr>
-			<tr>
-				<td>CEP</td>
-				<td>{{ person.addr_cep  }}</td>
-			</tr>
-			<tr>
-				<td>Cidade</td>
-				<td>{{ person.addr_city }}</td>
-			</tr>
-			<tr>
-				<td>UF</td>
-				<td>{{ person.addr_uf  }}</td>
-			</tr>
-			<tr>
-				<td>Constituição</td>
-				<td>{{ person.legla_birth }}</td>
-			</tr>
-			<tr>
-				<td>Data Cancelamento</td>
-				<td>{{ person.legal_death }}</td>
-			</tr>
-			<tr>
-				<td>Status</td>
-				<td>{{ person.legal_status }}</td>
-			</tr>
-			<tr>
-				<td>Created by: </td>
-				<td>{{ person.user_id }}: {{ creator }}</td>
-			</tr>
-			<tr>
-				<td>Creation time: </td>
-				<td>{{ moment(person.timestamp).format('LLLL') }}</td>
-			</tr>
-			<tr>
-				<td>Last edit by: </td>
-				<td>{{ person.last_editor }}: {{ editor }}</td>
-			</tr>
-			<tr>
-				<td>Last edit time: </td>
-				<td>{{ moment(person.last_edit_time).fromNow() }}</td>
-			</tr>
-		</table>
+{% if person != None %}
+  <div class="container">
+		<div class="row">
+			<div class="well text-center">
+				<h4><span class="glyphicon glyphicon-briefcase"></span> {{ person.legal_name }}</h4>
+			</div>
+		</div>
+    <div class="row">
+      <div class="col-xs-5">
+        <div class="panel panel-default">
+        	<div class="panel-heading text-center"><h4><span class="glyphicon glyphicon-envelope"></span></h4></div>
+        	<div class="panel-body">
+						{% if person.addr_rua %}
+            <p>
+							{{ person.addr_rua }} {% if person.addr_num %}, {{ person.addr_num }} {% if person. addr_compl %} - {{ person.addr_compl }} {% endif %} {% endif %}
+						</p>
+						{% endif %}
+						{% if person.addr_bairro %}
+            <p>{{ person.addr_bairro }}</p>
+						{% endif %}
+            <p>{{ person.addr_city }} - {{ person.addr_uf }}</p>
+            <p>{{ person.addr_cep[:-3] }}-{{ person.addr_cep[-3:] }}</p>
+						<a href="mailto:{{ person.email }}"><h4><span class="label label-primary">{{ person.email }}</span></h4></a>
+          </div>
+          {% if current_user.is_authenticated %}
+					<div class="panel-footer">
+						<button type="button" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#edit_contact"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+					</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-xs-7">
+				<div class="panel panel-default">
+        	<div class="panel-heading text-center"><h4><span class="glyphicon glyphicon-list-alt"></span></h4></div>
+        	<div class="panel-body">
+        		<p><strong>CNPJ: {{ person.asdict()['sic'] }}</strong></p>
+						<p><strong>TYPE: </strong>{{ person.asdict()['code'] }}</p>
+						<p><strong>STATUS: </strong>{{ person.legal_status }}</p>
+            <p><strong>LEGAL BIRTH: </strong>{{ moment(person.legal_birth).format('LL') }}</p>
+						{% if person.legal_death %}
+            <p><strong>LEGAL DEATH: </strong>{{ moment(person.legal_death).format('LL') }}</p>
+						{% endif %}
+          </div>
+          {% if current_user.is_authenticated %}
+					<div class="panel-footer">
+						<button type="button" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#edit_person"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+					</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+		{% if assets != [] %}
+	  <div class="row">
+	    <div class="panel panel-default">
+	      <div class="panel-heading text-center"><h4><span class="glyphicon glyphicon-home"></span></h4></div>
+	      <div class="panel-body">
+					<table id="people" class="display table table-striped table-hover table-condensed">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Shares</th>
+								<th>%</th>
+							</tr>
+						</thead>
+						<tbody>
+						{% for asset in assets %}
+						{% include 'people/_asset.html' %}
+						{% endfor %}
+						</tbody>
+					</table>
+	  		</div>
+			</div>
+		</div>
+		{% endif %}
+		<div class="row">
+			<div class="well">
+				<p>Last modification: {{ moment(person.last_edit_time).fromNow() }}, by: <strong>{{ person.editor }}</strong>
+          {% if current_user.is_authenticated %}
+          <a href="{{ url_for('people.delete_person', person_id=person.id) }}"
+            <button type="button" class="btn btn-lg btn-danger pull-right"><span class="glyphicon glyphicon-trash"></span></button>
+          </a>
+          {% endif %}
+        </p>
+				<p>Created: {{ moment(person.timestamp).format('LLLL') }}, by: <strong>{{ person.creator }}</strong></p>
+			</div>
+		</div>
 	</div>
-	{% else %}
-	<img src="http://www.quickmeme.com/img/a8/a8022006b463b5ed9be5a62f1bdbac43b4f3dbd5c6b3bb44707fe5f5e26635b0.jpg" class="img-responsive">
-	{% endif %}
+
+  {% include 'people/_edit_contact.html' %}
+
+  <div id="edit_person" class="modal fade" role="dialog">
+    <form method="post" action="" role="form" enctype="multipart/form-data">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close btn btn-danger" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Update Person Info</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              {{ form.csrf_token }}
+            </div>
+            <fieldset class="person">
+              <div class="form-group">
+                {{ form.legal_name.label(class="control-label") }}
+                {{ form.legal_name(class="form-control", value=person.legal_name) }}
+                {% for error in form.legal_name.errors %}
+                <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              </div>
+              <div class="form-group">
+                {{ form.code.label(class="control-label") }}
+                {{ form.code(class="form-control", id=person.code) }}
+                {% for error in form.code.errors %}
+                <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              </div>
+              <div class="form-group row">
+                <div class="col-xs-6">
+                  {{ form.legal_birth.label(class="control-label") }}
+                  {% if person.legal_birth %}
+                  {{ form.legal_birth(class="form-control", value=person.legal_birth) }}
+                  {% else %}
+                  {{ form.legal_birth(class="form-control") }}
+                  {% endif %}
+                  {% for error in form.legal_birth.errors %}
+                  <span class="help-block">{{ error }}</span>
+                  {% endfor %}
+                </div>
+                <div class="col-xs-6">
+                  {{ form.legal_death.label(class="control-label") }}
+                  {% if person.legal_death %}
+                  {{ form.legal_death(class="form-control", value=person.legal_death) }}
+                  {% else %}
+                  {{ form.legal_death(class="form-control") }}
+                  {% endif %}
+                  {% for error in form.legal_death.errors %}
+                  <span class="help-block">{{ error }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="form-group">
+                {{ form.legal_status.label(class="control-label") }}
+                {{ form.legal_status(class="form-control", value=person.legal_status) }}
+                {% for error in form.legal_status.errors %}
+                <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              </div>
+            </fieldset>
+          </div>
+          <div class="modal-footer">
+            <div class="form-group">
+              {{ form.submit.label(class="sr-only") }}
+              {{ form.submit(class="form-control btn-success") }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  {% else %}
+  <img src="http://www.quickmeme.com/img/a8/a8022006b463b5ed9be5a62f1bdbac43b4f3dbd5c6b3bb44707fe5f5e26635b0.jpg" class="img-responsive">
+  {% endif %}
 {% endblock %}
