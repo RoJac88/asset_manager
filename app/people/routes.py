@@ -90,6 +90,9 @@ def people():
 @bp.route('/person', methods=['GET', 'POST'])
 def person():
     person_id = request.args.get('person_id')
+    if not person_id:
+        return render_template('people/natural_person_view.html', person=None,
+            form=None, assets=None, contact_form=None)
     current_person = Person.query.get(person_id)
     form = None
     contact_form = EditContactForm()
