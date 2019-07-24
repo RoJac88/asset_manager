@@ -3,7 +3,7 @@ import os
 from werkzeug.utils import secure_filename
 from flask import render_template, flash, redirect, url_for, request, current_app, jsonify
 from app import db
-from app.realestate.forms import ImovelForm, UploadCSVForm
+from app.realestate.forms import ImovelForm, UploadCSVForm, EditContactForm, EditOwnersForm, OwnImovelForm
 from flask_login import current_user, login_required
 from app.models import Imovel, Cep, PersonImovel, NaturalPerson, LegalPerson, Person
 from datetime import datetime
@@ -37,19 +37,60 @@ def realestate():
     imoveis = Imovel.query.all()
     return render_template('realestate/realestate.html', imoveis=imoveis, form=form)
 
-@bp.route('/imovel/<imovel_id>', methods=['GET'])
+@bp.route('/imovel/<imovel_id>', methods=['GET', 'POST'])
 def imovel(imovel_id):
     imovel = Imovel.query.get(imovel_id)
+    contact_form = EditContactForm()
+    owners_form = EditOwnersForm()
+    info_fields = []
     owners = [] # List of tupples (PersonOjb, shares)
     ownerships = PersonImovel.query.filter_by(imovel_id=imovel_id)
     known_shares = 0
-    for item in ownerships:
+    for index, item in enumerate(ownerships):
+        line = OwnImovelForm()
         owner = Person.query.get(item.person_id)
         shares = item.shares
         known_shares += shares
+        if index > 0: owners_form.owners.append_entry()
         owners.append((owner, shares))
     unknown_shares = imovel.total_shares - known_shares
-    return render_template('realestate/imovel_view.html', imovel=imovel, owners=owners, unknown_shares=unknown_shares)
+    if owners_form.validate_on_submit():
+        print(owners_form)
+        imovel.total_shares = owners_form.total_shares.data
+        for ownership in ownerships:
+            db.session.delete(ownership)
+        for data in owners_form.owners.data:
+            print(data)
+            n = data['owner']
+            if n:
+                if len(n) == 11:
+                    owner = NaturalPerson.query.filter_by(cpf=n).first()
+                if len(n) == 14:
+                    owner = LegalPerson.query.filter_by(cnpj=n).first()
+                share = data['share']
+                person_has_estate = PersonImovel(person=owner, estate=imovel, shares=share)
+                db.session.add(person_has_estate)
+        db.session.commit()
+        flash('Successfully updated owners', 'success')
+        return redirect(url_for('realestate.imovel', imovel_id=imovel.id, owners=owners,
+            unknown_shares=unknown_shares, contact_form=contact_form, owners_form=owners_form,
+            fields=range(len(owners))))
+    if contact_form.validate_on_submit():
+        imovel.addr_cep = contact_form.addr_cep.data
+        imovel.addr_city = contact_form.addr_city.data
+        imovel.addr_uf = contact_form.addr_uf.data
+        imovel.addr_bairro = contact_form.addr_bairro.data
+        imovel.addr_rua = contact_form.addr_rua.data
+        imovel.addr_num = contact_form.addr_num.data
+        imovel.addr_compl = contact_form.addr_compl.data
+        db.session.commit()
+        flash('Contact details updated', 'success')
+        return redirect(url_for('realestate.imovel', imovel_id=imovel.id, owners=owners,
+            unknown_shares=unknown_shares, contact_form=contact_form, owners_form=owners_form,
+            fields=range(len(owners))))
+    return render_template('realestate/imovel_view.html', imovel=imovel, owners=owners,
+        unknown_shares=unknown_shares, contact_form=contact_form, owners_form=owners_form,
+        fields=range(len(owners)))
 
 @bp.route('/add_realestate', methods=['GET', 'POST'])
 @login_required

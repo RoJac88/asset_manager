@@ -17,6 +17,26 @@ class UploadCSVForm(FlaskForm):
     bom = BooleanField('BOM mark: ')
     submit = SubmitField('Upload')
 
+class EditContactForm(FlaskForm):
+    addr_cep = StringField('CEP', render_kw={'maxlength': 8})
+    addr_city = StringField('City', validators=[Optional()])
+    addr_uf = StringField('UF', validators=[Optional()], render_kw={'maxlength': 2})
+    addr_bairro = StringField('Bairro', validators=[Optional()])
+    addr_rua = StringField('Rua', validators=[Optional()])
+    addr_num = StringField('N.', validators=[Optional()])
+    addr_compl = StringField('Compl', validators=[Optional()])
+    email = StringField('Email', validators=[Optional(), Email()])
+    submit = SubmitField('Update')
+
+    def validate_addr_cep(self, addr_cep):
+        if Cep.query.get(addr_cep.data) == None:
+            raise ValidationError('Invalid CEP')
+
+class EditOwnersForm(FlaskForm):
+    owners = FieldList(FormField(OwnImovelForm), min_entries=1)
+    total_shares = IntegerField('Total Shares')
+    submit = SubmitField('Update')
+
 class ImovelForm(FlaskForm):
     name = StringField('Name')
     sql = StringField('SQL', validators=[Optional()], render_kw={'maxlength': 9})
