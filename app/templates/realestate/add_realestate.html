@@ -34,6 +34,7 @@
 
       $("#add_own").on('click', function() {
         var $newOwner = $('.owner_form').last().clone();
+        $newOwner.find("input[type='text']").val("");
         var tags = $newOwner.children().prop("for").split("-");
         var index = parseInt(tags[1], 10);
         var next = index + 1;
