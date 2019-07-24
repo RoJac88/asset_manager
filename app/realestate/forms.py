@@ -37,6 +37,45 @@ class EditOwnersForm(FlaskForm):
     total_shares = IntegerField('Total Shares')
     submit = SubmitField('Update')
 
+    def validate_total_shares(self, total_shares):
+        known_shares = 0
+        for owner in self.owners:
+            print(owner['share'].data)
+            known_shares += owner['share'].data
+        if known_shares > total_shares.data:
+            error = 'Total shares must be greater that the sum of known shares'
+            flash(error, 'danger')
+            raise ValidationError(error)
+
+    def validate_owners(self, owners):
+        error = None
+        owner_set = set()
+        for item in owners:
+            n = item.data['owner']
+            share = item.data['share']
+            if share is None or share == 0:
+                error = 'Shares must be non zero'
+                flash(error, 'danger')
+                raise ValidationError(error)
+            if n in owner_set:
+                error = 'Only one line per owner'
+                flash(error, 'danger')
+                raise ValidationError(error)
+            else:
+                owner_set.add(n)
+            if len(n)!=11 and len(n)!=14:
+                error = 'Invalid length for CPF / CNPJ'
+                flash(error, 'danger')
+                raise ValidationError(error)
+            if len(n)==11 and NaturalPerson.query.filter_by(cpf=n).first()==None:
+                error = 'CPF not found'
+                flash(error, 'danger')
+                raise ValidationError(error)
+            if len(n)==14 and LegalPerson.query.filter_by(cnpj=n).first()==None:
+                error = 'CNPJ not found'
+                flash(error, 'danger')
+                raise ValidationError(error)
+
 class ImovelForm(FlaskForm):
     name = StringField('Name')
     sql = StringField('SQL', validators=[Optional()], render_kw={'maxlength': 9})
@@ -55,6 +94,16 @@ class ImovelForm(FlaskForm):
     owners = FieldList(FormField(OwnImovelForm), min_entries=1)
     total_shares = IntegerField('Total Shares')
     submit = SubmitField('Insert')
+
+    def validate_total_shares(self, total_shares):
+        known_shares = 0
+        for owner in self.owners:
+            print(owner['share'].data)
+            known_shares += owner['share'].data
+        if known_shares > total_shares.data:
+            error = 'Total shares must be greater that the sum of known shares'
+            flash(error, 'danger')
+            raise ValidationError(error)
 
     def validate_addr_cep(self, addr_cep):
         if Cep.query.get(addr_cep.data) == None:
