@@ -1,10 +1,10 @@
 <tr>
 	{% if owner[0].name %}
   <td>{{ owner[0].cpf[:3]+'.'+owner[0].cpf[3:6]+'.'+owner[0].cpf[6:9]+'-'+owner[0].cpf[9:] }}</td>
-	<td>{{ owner[0].name }}</td>
+	<td class="chart-label">{{ owner[0].name }}</td>
 	{% elif owner[0].legal_name %}
   <td>{{ owner[0].cnpj[:2]+'.'+owner[0].cnpj[2:5]+'.'+owner[0].cnpj[5:8]+'/'+owner[0].cnpj[8:12]+'-'+owner[0].cnpj[12:] if owner[0].type == 'legal' }}</td>
-	<td>{{ owner[0].legal_name }}</td>
+	<td class="chart-label">{{ owner[0].legal_name }}</td>
 	{% endif %}
-	<td>{{ owner[1] }}</td>
+	<td class="chart-data">{{ owner[1] }}</td>
 </tr>
