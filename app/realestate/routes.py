@@ -46,14 +46,6 @@ def imovel(imovel_id):
     owners = [] # List of tupples (PersonOjb, shares)
     ownerships = PersonImovel.query.filter_by(imovel_id=imovel_id)
     known_shares = 0
-    for index, item in enumerate(ownerships):
-        line = OwnImovelForm()
-        owner = Person.query.get(item.person_id)
-        shares = item.shares
-        known_shares += shares
-        if index > 0: owners_form.owners.append_entry()
-        owners.append((owner, shares))
-    unknown_shares = imovel.total_shares - known_shares
     if owners_form.validate_on_submit():
         print(owners_form)
         imovel.total_shares = owners_form.total_shares.data
@@ -68,13 +60,25 @@ def imovel(imovel_id):
                 if len(n) == 14:
                     owner = LegalPerson.query.filter_by(cnpj=n).first()
                 share = data['share']
+                if share: known_shares += share
                 person_has_estate = PersonImovel(person=owner, estate=imovel, shares=share)
                 db.session.add(person_has_estate)
         db.session.commit()
         flash('Successfully updated owners', 'success')
+        unknown_shares = imovel.total_shares - known_shares
         return redirect(url_for('realestate.imovel', imovel_id=imovel.id, owners=owners,
             unknown_shares=unknown_shares, contact_form=contact_form, owners_form=owners_form,
             fields=range(len(owners))))
+    for index, item in enumerate(ownerships):
+        line = OwnImovelForm()
+        owner = Person.query.get(item.person_id)
+        shares = item.shares
+        known_shares += shares
+        if index > 0: owners_form.owners.append_entry()
+        owners.append((owner, shares))
+    unknown_shares = imovel.total_shares - known_shares
+    while len(list(owners_form.owners)) > len(owners):
+        owners_form.owners.pop_entry()
     if contact_form.validate_on_submit():
         imovel.addr_cep = contact_form.addr_cep.data
         imovel.addr_city = contact_form.addr_city.data
