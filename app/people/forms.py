@@ -66,8 +66,8 @@ class AddLegalPersonFrom(FlaskForm):
     addr_rua = StringField('Rua', validators=[Optional()])
     addr_num = StringField('N.', validators=[Optional()])
     addr_compl = StringField('Compl', validators=[Optional()])
-    legal_birth = DateField('YYY-MM-DD', validators=[Optional()])
-    legal_death = DateField('YYY-MM-DD', validators=[Optional()])
+    legal_birth = DateField('Legal Birth', validators=[Optional()])
+    legal_death = DateField('Legal Death', validators=[Optional()])
     legal_status = StringField(validators=[Optional()])
     submit = SubmitField('Insert')
 

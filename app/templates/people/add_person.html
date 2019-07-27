@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 
+{% block head %}
+	{{ super() }}
+	<style>
+    .modal-dialog {
+      width: 75%;
+      margin: 0 auto;
+    }
+	</style>
+{% endblock %}
+
 {% block scripts %}
   {{ super() }}
   <script>
@@ -40,33 +50,202 @@
 {% endblock %}
 
 {% block app_content %}
-  <div class="container">
-    <h2>Add Person</h2>
-
-    <ul class="nav nav-tabs">
-      <li class="{{ 'active' if 'cnpj' not in dict(request.form) }}"><a data-toggle="tab" href="#natural">Natural Person</a></li>
-      <li class="{{ 'active' if 'cnpj' in dict(request.form) }}"><a data-toggle="tab" href="#legal">Legal Person</a></li>
-    </ul>
-
-    <div class="tab-content">
-      <div id="natural" class="tab-pane fade {{'in active' if 'cnpj' not in dict(request.form)}}">
-          <h3>Add Natural Person</h3>
-          <div class="row">
-              <div class="col-sm-4" style="background-color:lavender">
-                  {{ wtf.quick_form(form1) }}
-              </div>
-          </div>
+<div class="container">
+  <div class="row">
+    <div class="well text-center"><h4>Add Person</h4></div>
+    <div class="col-xs-6">
+      <div class="panel panel-info">
+      	<div class="panel-heading text-center"><h4><span class="glyphicon glyphicon-user"></span></h4></div>
+      	<div class="panel-body">
+          <p><strong>Required info: </strong></p>
+          <ul>
+            <li>CPF</li>
+            <li>Name</li>
+            <li>CEP</li>
+          </ul>
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#natural_person"><span class="glyphicon glyphicon-plus"></span> Add Natural Person</button>
+        </div>
       </div>
-
-      <div id="legal" class="tab-pane fade {{'in active' if 'cnpj' in dict(request.form)}}">
-          <h3>Add Legal Person</h3>
-          <div class="row">
-              <div class="col-sm-4" style="background-color:cornsilk">
-                  {{ wtf.quick_form(form2) }}
-              </div>
-          </div>
+    </div>
+    <div class="col-xs-6">
+      <div class="panel panel-warning">
+      	<div class="panel-heading text-center"><h4><span class="glyphicon glyphicon-briefcase"></span></h4></div>
+      	<div class="panel-body">
+          <p><strong>Required info: </strong></p>
+          <ul>
+            <li>CNPJ</li>
+            <li>Legal Name</li>
+            <li>CEP</li>
+          </ul>
+          <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#legal_person"><span class="glyphicon glyphicon-plus"></span> Add Legal Person</button>
+        </div>
       </div>
-
     </div>
   </div>
+</div>
+
+<div id="natural_person" class="modal fade" role="dialog">
+  <form method="post" action="" role="form" enctype="multipart/form-data">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close btn btn-danger" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title text-center"><span class="glyphicon glyphicon-user"></span> Add Natural Person</h4>
+        </div>
+        <div class="modal-body row">
+          <div class="form-group">
+            {{ form1.csrf_token }}
+          </div>
+          <div class="col-xs-7">
+            <fieldset class="addr">
+              <legend class="addr">Address Details</legend>
+              <div class="form-group">
+                {{ form1.addr_cep_nat.label(class="control-label") }}
+                {{ form1.addr_cep_nat(class="form-control") }}
+                {% for error in form1.addr_cep_nat.errors %}
+                <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              </div>
+              <div class="row">
+                <div class="col-xs-10">
+                  {{ form1.addr_city.label(class="control-label") }}
+                  {{ form1.addr_city(class="form-control") }}
+                </div>
+                <div class="col-xs-2">
+                  {{ form1.addr_uf.label(class="control-label") }}
+                  {{ form1.addr_uf(class="form-control") }}
+                </div>
+              </div>
+              {{ form1.addr_bairro.label(class="control-label") }}
+              {{ form1.addr_bairro(class="form-control") }}
+              <div class="row">
+                <div class="col-xs-10">
+                  {{ form1.addr_rua.label(class="control-label") }}
+                  {{ form1.addr_rua(class="form-control") }}
+                </div>
+                <div class="col-xs-2">
+                  {{ form1.addr_num.label(class="control-label") }}
+                  {{ form1.addr_num(class="form-control") }}
+                </div>
+              </div>
+              {{ form1.addr_compl.label(class="control-label") }}
+              {{ form1.addr_compl(class="form-control") }}
+            </fieldset>
+          </div>
+          <div class="col-xs-5">
+            <fieldset class="nat_info">
+              <legend class="nat_info">Person Details</legend>
+              <div class="form-group">
+                {{ form1.name.label(class="control-label") }}
+                {{ form1.name(class="form-control") }}
+                {{ form1.cpf.label(class="control-label") }}
+                {{ form1.cpf(class="form-control") }}
+                {{ form1.rg.label(class="control-label") }}
+                {{ form1.rg(class="form-control") }}
+              </div>
+              <div class="form-group">
+                {{ form1.email.label(class="control-label") }}
+                {{ form1.email(class="form-control") }}
+              </div>
+            </fieldset>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="form-group">
+            {{ form1.submit.label(class="sr-only") }}
+            {{ form1.submit(class="form-control btn-success") }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div id="legal_person" class="modal fade" role="dialog">
+  <form method="post" action="" role="form" enctype="multipart/form-data">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close btn btn-danger" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title text-center"><span class="glyphicon glyphicon-user"></span> Add Legal Person</h4>
+        </div>
+        <div class="modal-body row">
+          <div class="form-group">
+            {{ form2.csrf_token }}
+          </div>
+          <div class="col-xs-7">
+            <fieldset class="addr">
+              <legend class="addr">Address Details</legend>
+              <div class="form-group">
+                {{ form2.addr_cep_leg.label(class="control-label") }}
+                {{ form2.addr_cep_leg(class="form-control") }}
+                {% for error in form2.addr_cep_leg.errors %}
+                <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              </div>
+              <div class="row">
+                <div class="col-xs-10">
+                  {{ form2.addr_city.label(class="control-label") }}
+                  {{ form2.addr_city(class="form-control") }}
+                </div>
+                <div class="col-xs-2">
+                  {{ form2.addr_uf.label(class="control-label") }}
+                  {{ form2.addr_uf(class="form-control") }}
+                </div>
+              </div>
+              {{ form2.addr_bairro.label(class="control-label") }}
+              {{ form2.addr_bairro(class="form-control") }}
+              <div class="row">
+                <div class="col-xs-10">
+                  {{ form2.addr_rua.label(class="control-label") }}
+                  {{ form2.addr_rua(class="form-control") }}
+                </div>
+                <div class="col-xs-2">
+                  {{ form2.addr_num.label(class="control-label") }}
+                  {{ form2.addr_num(class="form-control") }}
+                </div>
+              </div>
+              {{ form2.addr_compl.label(class="control-label") }}
+              {{ form2.addr_compl(class="form-control") }}
+            </fieldset>
+          </div>
+          <div class="col-xs-5">
+            <fieldset class="legal_info">
+              <legend class="legal_info">Legal Person Details</legend>
+              <div class="form-group">
+                {{ form2.legal_name.label(class="control-label") }}
+                {{ form2.legal_name(class="form-control") }}
+                {{ form2.cnpj.label(class="control-label") }}
+                {{ form2.cnpj(class="form-control") }}
+                {{ form2.code.label(class="control-label") }}
+                {{ form2.code(class="form-control") }}
+              </div>
+              <div class="row">
+                <div class="col-xs-6">
+                  {{ form2.legal_birth.label(class="control-label") }}
+                  {{ form2.legal_birth(class="form-control") }}
+                </div>
+                <div class="col-xs-6">
+                  {{ form2.legal_death.label(class="control-label") }}
+                  {{ form2.legal_death(class="form-control") }}
+                </div>
+              </div>
+              <div class="form-group">
+                {{ form2.email.label(class="control-label") }}
+                {{ form2.email(class="form-control") }}
+              </div>
+            </fieldset>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="form-group">
+            {{ form2.submit.label(class="sr-only") }}
+            {{ form2.submit(class="form-control btn-success") }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
 {% endblock %}
