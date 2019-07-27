@@ -1,11 +1,47 @@
+from flask import flash
 from flask_wtf import FlaskForm
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms import StringField, SubmitField, BooleanField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import ValidationError, DataRequired, Optional, Email
 from app.models import NaturalPerson, LegalPCodes, Cep
+from app.people.helpers import cnpj_isvalid, cpf_isvalid
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from datetime import datetime
+
+def validate_addr_cep(self, addr_cep):
+    if Cep.query.get(addr_cep.data) == None:
+        error = 'Invalid CEP'
+        flash(error, 'danger')
+        raise ValidationError('Invalid CEP')
+
+def validate_rg(self, rg):
+    if len(rg.data) > 11:
+        error = 'Invalid RG'
+        flash(error, 'danger')
+        raise ValidationError(error)
+
+def validate_cnpj(self, cnpj):
+    if not cnpj_isvalid(cnpj.data):
+        error = 'Invalid CNPJ'
+        flash(error, 'danger')
+        raise ValidationError(error)
+    person = LegalPerson.query.filter_by(cnpj=cnpj.data).first()
+    if person is not None:
+        error = 'This CNPJ is already in the database'
+        flash(error, 'danger')
+        raise ValidationError(error)
+
+def validate_cpf(self, cpf):
+    if not cpf_isvalid(cpf.data):
+        error = 'Invalid CPF number'
+        flash(error, 'danger')
+        raise ValidationError(error)
+    person = NaturalPerson.query.filter_by(cpf=cpf.data).first()
+    if person is not None:
+        error = 'This CPF is already in the database'
+        flash(error, 'danger')
+        raise ValidationError(error)
 
 class UploadCSVForm(FlaskForm):
     csv = FileField('CSV (utf-8): ', validators=[
@@ -16,7 +52,7 @@ class UploadCSVForm(FlaskForm):
     submit = SubmitField('Upload')
 
 class EditContactForm(FlaskForm):
-    addr_cep = StringField('CEP', render_kw={'maxlength': 8})
+    addr_cep = StringField('CEP', render_kw={'maxlength': 8}, validators=[validate_addr_cep])
     addr_city = StringField('City', validators=[Optional()])
     addr_uf = StringField('UF', validators=[Optional()], render_kw={'maxlength': 2})
     addr_bairro = StringField('Bairro', validators=[Optional()])
@@ -26,17 +62,11 @@ class EditContactForm(FlaskForm):
     email = StringField('Email', validators=[Optional(), Email()])
     submit = SubmitField('Update')
 
-    def validate_addr_cep(self, addr_cep):
-        if Cep.query.get(addr_cep.data) == None:
-            raise ValidationError('Invalid CEP')
-
 class EditNaturalPersonForm(FlaskForm):
     name = StringField('Name')
-    rg = StringField('RG', validators=[Optional()])
+    rg = StringField('RG', validators=[Optional(), validate_rg])
     submit = SubmitField('Update')
 
-    def validate_rg(self, rg):
-        if len(rg.data) > 11: raise ValidationError('Invalid RG')
 
 class EditLegalPersonForm(FlaskForm):
     legal_name = StringField('Legal Name')
@@ -47,19 +77,14 @@ class EditLegalPersonForm(FlaskForm):
     legal_status = StringField(validators=[Optional()])
     submit = SubmitField('Update')
 
-    def validate_cnpj(self, cnpj):
-        if not cnpj.data.isdigit():
-            raise ValidationError('CNPJ must contain only digits')
-        if len(cnpj.data) != 14:
-            raise ValidationError('Invalid CNPJ number')
 
 class AddLegalPersonFrom(FlaskForm):
     legal_name = StringField('Legal Name', validators=[DataRequired()])
-    cnpj = StringField('CNPJ', validators=[DataRequired()], render_kw={'maxlength': 14})
+    cnpj = StringField('CNPJ', validators=[DataRequired(), validate_cnpj], render_kw={'maxlength': 14})
     code = QuerySelectField('Code',
         query_factory=lambda: LegalPCodes.query, allow_blank=False)
     email = StringField('Email', validators=[Optional(), Email()])
-    addr_cep_leg = StringField('CEP', render_kw={'maxlength': 8})
+    addr_cep_leg = StringField('CEP', render_kw={'maxlength': 8}, validators=[validate_addr_cep])
     addr_city = StringField('City', validators=[Optional()])
     addr_uf = StringField('UF', validators=[Optional()], render_kw={'maxlength': 2})
     addr_bairro = StringField('Bairro', validators=[Optional()])
@@ -71,22 +96,13 @@ class AddLegalPersonFrom(FlaskForm):
     legal_status = StringField(validators=[Optional()])
     submit = SubmitField('Insert')
 
-    def validate_cnpj(self, cnpj):
-        if not cnpj.data.isdigit():
-            raise ValidationError('CNPJ must contain only digits')
-        if len(cnpj.data) != 14:
-            raise ValidationError('Invalid CNPJ number')
-
-    def validate_addr_cep_leg(self, addr_cep):
-        if Cep.query.get(addr_cep.data) == None:
-            raise ValidationError('Invalid CEP')
 
 class AddNaturalPersonForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
-    cpf = StringField('CPF', validators=[DataRequired()], render_kw={'maxlength': 11})
+    cpf = StringField('CPF', validators=[DataRequired(), validate_cpf], render_kw={'maxlength': 11})
     rg = StringField('RG', validators=[Optional()])
     email = StringField('Email', validators=[Optional(), Email()])
-    addr_cep_nat = StringField('CEP', render_kw={'maxlength': 8})
+    addr_cep_nat = StringField('CEP', render_kw={'maxlength': 8}, validators=[validate_addr_cep])
     addr_city = StringField('City', validators=[Optional()])
     addr_uf = StringField('UF', validators=[Optional()], render_kw={'maxlength': 2})
     addr_bairro = StringField('Bairro', validators=[Optional()])
@@ -94,30 +110,3 @@ class AddNaturalPersonForm(FlaskForm):
     addr_num = StringField('N.', validators=[Optional()])
     addr_compl = StringField('Compl', validators=[Optional()])
     submit = SubmitField('Insert')
-
-    def validate_addr_cep_nat(self, addr_cep):
-        if Cep.query.get(addr_cep.data) == None:
-            raise ValidationError('Invalid CEP')
-
-    def validate_rg(self, rg):
-        if len(rg.data) > 11: raise ValidationError('Invalid RG')
-
-    def validate_cpf(self, cpf):
-        if not cpf.data.isdigit():
-            raise ValidationError('CPF must contain only digits')
-        if len(cpf.data) != 11:
-            raise ValidationError('Invalid CPF number')
-        person = NaturalPerson.query.filter_by(cpf=cpf.data).first()
-        if person is not None:
-            raise ValidationError('This CPF is already in the database')
-        numbers = [int(digit) for digit in cpf.data if digit.isdigit()]
-        # Validação do primeiro dígito verificador:
-        sum_of_products = sum(a*b for a, b in zip(numbers[0:9], range(10, 1, -1)))
-        expected_digit = (sum_of_products * 10 % 11) % 10
-        if numbers[9] != expected_digit:
-            raise ValidationError('Invalid CPF number')
-        # Validação do segundo dígito verificador:
-        sum_of_products = sum(a*b for a, b in zip(numbers[0:10], range(11, 1, -1)))
-        expected_digit = (sum_of_products * 10 % 11) % 10
-        if numbers[10] != expected_digit:
-            raise ValidationError('Invalid CPF number')
