@@ -16,7 +16,9 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     persons = db.relationship('Person', backref='creator', lazy='dynamic', foreign_keys='Person.user_id')
     files = db.relationship('UserFile', backref='owner', lazy='select', foreign_keys='UserFile.user_id')
+    estates = db.relationship('Imovel', backref='creator', lazy='dynamic', foreign_keys='Imovel.user_id')
     persons_edited = db.relationship('Person', backref='editor', lazy='dynamic', foreign_keys='Person.last_editor')
+    estates_edited = db.relationship('Imovel', backref='editor', lazy='dynamic', foreign_keys='Imovel.last_editor')
     templates_added = db.relationship('TemplateDocx', backref='author', lazy='dynamic', foreign_keys='TemplateDocx.user_id')
 
     def __repr__(self):
@@ -216,6 +218,10 @@ class Imovel(db.Model):
     matricula_file_date = db.Column(db.DateTime, index=True, default=datetime(1889,11,15))
     total_shares = db.Column(db.Integer)
     files = db.relationship('ImovelFile', backref='imovel', lazy='select', foreign_keys='ImovelFile.imovel_id')
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    last_editor = db.Column(db.Integer, db.ForeignKey('user.id'))
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    last_edit_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 class Cep(db.Model):
     id = db.Column(db.String(8), primary_key=True)

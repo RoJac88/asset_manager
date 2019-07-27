@@ -47,7 +47,6 @@ def imovel(imovel_id):
     ownerships = PersonImovel.query.filter_by(imovel_id=imovel_id)
     known_shares = 0
     if owners_form.validate_on_submit():
-        print(owners_form)
         imovel.total_shares = owners_form.total_shares.data
         for ownership in ownerships:
             db.session.delete(ownership)
@@ -63,6 +62,8 @@ def imovel(imovel_id):
                 if share: known_shares += share
                 person_has_estate = PersonImovel(person=owner, estate=imovel, shares=share)
                 db.session.add(person_has_estate)
+        imovel.last_edit_time = datetime.utcnow()
+        imovel.last_editor = current_user.id
         db.session.commit()
         flash('Successfully updated owners', 'success')
         unknown_shares = imovel.total_shares - known_shares
@@ -87,6 +88,8 @@ def imovel(imovel_id):
         imovel.addr_rua = contact_form.addr_rua.data
         imovel.addr_num = contact_form.addr_num.data
         imovel.addr_compl = contact_form.addr_compl.data
+        imovel.last_edit_time = datetime.utcnow()
+        imovel.last_editor = current_user.id
         db.session.commit()
         flash('Contact details updated', 'success')
         return redirect(url_for('realestate.imovel', imovel_id=imovel.id, owners=owners,
@@ -124,6 +127,8 @@ def add_realestate():
         new_realestate.matricula_n = form.matricula_n.data
         new_realestate.matricula_file_date = datetime.utcnow()
         new_realestate.total_shares = form.total_shares.data
+        new_realestate.user_id = current_user.id
+        new_realestate.last_editor = current_user.id
         db.session.add(new_realestate)
         for data in form.owners.data:
             n = data['owner']
