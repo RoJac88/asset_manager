@@ -37,8 +37,9 @@ def realestate():
     imoveis = Imovel.query.all()
     return render_template('realestate/realestate.html', imoveis=imoveis, form=form)
 
-@bp.route('/imovel/<imovel_id>', methods=['GET', 'POST'])
-def imovel(imovel_id):
+@bp.route('/imovel', methods=['GET', 'POST'])
+def imovel():
+    imovel_id = request.args.get('imovel_id')
     imovel = Imovel.query.get(imovel_id)
     contact_form = EditContactForm()
     owners_form = EditOwnersForm()
