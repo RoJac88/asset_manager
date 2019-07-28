@@ -196,15 +196,55 @@
         <div class="col-xs-1">
           <img src="{{ url_for('static', filename='pdf.png') }}" class="img-responsive" width=48 height=48>
         </div>
-        <div class="col-xs-11">
-          <p>Data: {{ moment(imovel.matricula_file_date).format('LLLL') }}</p>
+        <div class="col-xs-3">
+          <p><strong> {{ moment(imovel.matricula_file_date).format('LL') }}</strong></p>
           <a href="{{ url_for('main.download_file', filepath=imovel.matricula_file) }}">
       		  <button type="button" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-download-alt"></span> Download</button>
       		</a>
-          <button type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-refresh"></span>Atualizar Matrícula</button>
+          <button type="button" class="btn btn-info btn-sm" data-toggle="collapse" data-target="#matricula"><span class="glyphicon glyphicon-refresh"></span> Update</button>
         </div>
+        <div class="col-xs-8">
+    			<div class="collapse" id="matricula">
+    				<form method="post" action="" class="form-inline" role="form" enctype="multipart/form-data">
+    					<div class = "form-group">
+    				    {{ mat_form.csrf_token }}
+    				    {{ mat_form.matricula_file.label(class="control-label") }}
+    						{{ mat_form.matricula_file(class="form-control") }}
+    					</div>
+    					<div class ="form-group">
+    						{{ mat_form.matricula_file_date.label() }}
+    						{{ mat_form.matricula_file_date(class="form-control") }}
+    					</div>
+    					<div class ="form-group required">
+    						{{ mat_form.submit_mat.label(class="sr-only") }}
+    						{{ mat_form.submit_mat(class="form-control btn-success") }}
+    					</div>
+    				</form>
+    			</div>
+    		</div>
         {% else %}
-        <button type="button" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Incluir Matrícula</button>
+        <div class="col-xs-3">
+          <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#matricula"><span class="glyphicon glyphicon-plus"></span> Add PDF</button>
+        </div>
+        <div class="col-xs-9">
+          <div class="collapse" id="matricula">
+    				<form method="post" action="" class="form-inline" role="form" enctype="multipart/form-data">
+    					<div class = "form-group">
+    				    {{ mat_form.csrf_token }}
+    				    {{ mat_form.matricula_file.label(class="control-label") }}
+    						{{ mat_form.matricula_file(class="form-control") }}
+    					</div>
+    					<div class ="form-group">
+    						{{ mat_form.matricula_file_date.label() }}
+    						{{ mat_form.matricula_file_date(class="form-control") }}
+    					</div>
+    					<div class ="form-group required">
+    						{{ mat_form.submit_mat.label(class="sr-only") }}
+    						{{ mat_form.submit_mat(class="form-control btn-success") }}
+    					</div>
+    				</form>
+    			</div>
+        </div>
         {% endif %}
       </div>
     </div>

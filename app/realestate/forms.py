@@ -10,6 +10,10 @@ def validate_total_shares(self, total_shares):
     known_shares = 0
     for owner in self.owners:
         if owner['share'].data: known_shares += owner['share'].data
+    if not total_shares.data:
+        error = 'Total shares cannot be None'
+        flash(error, 'danger')
+        raise ValidationError(error)
     if known_shares > total_shares.data:
         error = 'Total shares must be greater that the sum of known shares'
         flash(error, 'danger')
@@ -69,7 +73,7 @@ class EditContactForm(FlaskForm):
     addr_num = StringField('N.', validators=[Optional()])
     addr_compl = StringField('Compl', validators=[Optional()])
     email = StringField('Email', validators=[Optional(), Email()])
-    submit = SubmitField('Update')
+    submit_contact = SubmitField('Update')
 
     def validate_addr_cep(self, addr_cep):
         if Cep.query.get(addr_cep.data) == None:
@@ -78,7 +82,15 @@ class EditContactForm(FlaskForm):
 class EditOwnersForm(FlaskForm):
     owners = FieldList(FormField(OwnImovelForm), min_entries=1, validators=[validate_owners])
     total_shares = IntegerField('Total Shares', validators=[validate_total_shares])
-    submit = SubmitField('Update')
+    submit_owners = SubmitField('Update')
+
+class MatriculaUpdateForm(FlaskForm):
+    matricula_file = FileField('Matrícula (PDF): ', validators=[
+        Optional(),
+        FileAllowed(['pdf'], 'PDF flies only')
+    ])
+    matricula_file_date = DateField('Date')
+    submit_mat = SubmitField('Update')
 
 class ImovelForm(FlaskForm):
     name = StringField('Name')
@@ -95,6 +107,7 @@ class ImovelForm(FlaskForm):
         Optional(),
         FileAllowed(['pdf'], 'PDF flies only')
     ])
+    matricula_file_date = DateField('Matrícula PDF Date', validators=[Optional()])
     owners = FieldList(FormField(OwnImovelForm), min_entries=1, validators=[validate_owners])
     total_shares = IntegerField('Total Shares', validators=[validate_total_shares])
     submit = SubmitField('Insert')

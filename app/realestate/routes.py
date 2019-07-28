@@ -3,7 +3,7 @@ import os
 from werkzeug.utils import secure_filename
 from flask import render_template, flash, redirect, url_for, request, current_app, jsonify
 from app import db
-from app.realestate.forms import ImovelForm, UploadCSVForm, EditContactForm, EditOwnersForm, OwnImovelForm
+from app.realestate.forms import ImovelForm, UploadCSVForm, EditContactForm, EditOwnersForm, OwnImovelForm, MatriculaUpdateForm
 from flask_login import current_user, login_required
 from app.models import Imovel, Cep, PersonImovel, NaturalPerson, LegalPerson, Person
 from datetime import datetime
@@ -43,11 +43,12 @@ def imovel():
     imovel = Imovel.query.get(imovel_id)
     contact_form = EditContactForm()
     owners_form = EditOwnersForm()
+    mat_form = MatriculaUpdateForm()
     info_fields = []
     owners = [] # List of tupples (PersonOjb, shares)
     ownerships = PersonImovel.query.filter_by(imovel_id=imovel_id)
     known_shares = 0
-    if owners_form.validate_on_submit():
+    if current_user.is_authenticated and owners_form.submit_owners.data and owners_form.validate_on_submit():
         imovel.total_shares = owners_form.total_shares.data
         for ownership in ownerships:
             db.session.delete(ownership)
@@ -70,7 +71,7 @@ def imovel():
         unknown_shares = imovel.total_shares - known_shares
         return redirect(url_for('realestate.imovel', imovel_id=imovel.id, owners=owners,
             unknown_shares=unknown_shares, contact_form=contact_form, owners_form=owners_form,
-            fields=range(len(owners))))
+            fields=range(len(owners)), mat_form=mat_form))
     for index, item in enumerate(ownerships):
         line = OwnImovelForm()
         owner = Person.query.get(item.person_id)
@@ -81,7 +82,26 @@ def imovel():
     unknown_shares = imovel.total_shares - known_shares
     while len(list(owners_form.owners)) > len(owners):
         owners_form.owners.pop_entry()
-    if contact_form.validate_on_submit():
+    if current_user.is_authenticated and mat_form.submit_mat.data and mat_form.validate_on_submit():
+        target = current_app.config['RE_FILES_FOLDER']
+        file = mat_form.matricula_file.data
+        file_name = secure_filename('MAT_'+imovel.matricula_n+'SQL_'+imovel.sql+'.pdf')
+        file_path = os.path.abspath(os.path.join(target,file_name))
+        if file is not None:
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+            file.save(file_path)
+            print('File saved: {}'.format(file_name))
+            imovel.matricula_file = file_path
+        imovel.matricula_file_date = mat_form.matricula_file_date.data
+        imovel.last_edit_time = datetime.utcnow()
+        imovel.last_editor = current_user.id
+        db.session.commit()
+        flash('Matricula file updated', 'success')
+        return redirect(url_for('realestate.imovel', imovel_id=imovel.id, owners=owners,
+            unknown_shares=unknown_shares, contact_form=contact_form, owners_form=owners_form,
+            fields=range(len(owners)), mat_form=mat_form))
+    if current_user.is_authenticated and contact_form.validate_on_submit():
         imovel.addr_cep = contact_form.addr_cep.data
         imovel.addr_city = contact_form.addr_city.data
         imovel.addr_uf = contact_form.addr_uf.data
@@ -95,10 +115,10 @@ def imovel():
         flash('Contact details updated', 'success')
         return redirect(url_for('realestate.imovel', imovel_id=imovel.id, owners=owners,
             unknown_shares=unknown_shares, contact_form=contact_form, owners_form=owners_form,
-            fields=range(len(owners))))
+            fields=range(len(owners)), mat_form=mat_form))
     return render_template('realestate/imovel_view.html', imovel=imovel, owners=owners,
         unknown_shares=unknown_shares, contact_form=contact_form, owners_form=owners_form,
-        fields=range(len(owners)))
+        fields=range(len(owners)), mat_form=mat_form)
 
 @bp.route('/add_realestate', methods=['GET', 'POST'])
 @login_required
@@ -126,7 +146,7 @@ def add_realestate():
         new_realestate.addr_num = form.addr_num.data
         new_realestate.addr_compl = form.addr_compl.data
         new_realestate.matricula_n = form.matricula_n.data
-        new_realestate.matricula_file_date = datetime.utcnow()
+        new_realestate.matricula_file_date = form.matricula_file_date.data
         new_realestate.total_shares = form.total_shares.data
         new_realestate.user_id = current_user.id
         new_realestate.last_editor = current_user.id
