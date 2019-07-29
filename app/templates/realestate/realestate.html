@@ -32,9 +32,9 @@
 {% endblock %}
 
 {% block app_content %}
-{% if current_user.is_authenticated %}
 <div class="container">
 	<div class="well text-center"><h4>Real Estate Entries</h4></div>
+	{% if current_user.is_authenticated %}
 	<div class="row">
 		<div class="col-sm-3">
 			<a href="{{ url_for('realestate.add_realestate') }}">
@@ -69,9 +69,9 @@
 			</div>
 		</div>
 	</div>
+	{% endif %}
 </div>
 <br>
-{% endif %}
 
 {% if imoveis != [] %}
 <div class="container">

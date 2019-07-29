@@ -35,7 +35,7 @@
     <div class="row">
       <div class="col-xs-5">
         <div class="panel panel-default">
-        	<div class="panel-heading text-center"><h4><span class="glyphicon glyphicon-envelope"></span></h4></div>
+        	<div class="panel-heading text-center panel-headstyle"><h4><span class="glyphicon glyphicon-envelope"></span></h4></div>
         	<div class="panel-body">
 						{% if person.addr_rua %}
             <p>
@@ -58,7 +58,7 @@
       </div>
       <div class="col-xs-7">
 				<div class="panel panel-default">
-        	<div class="panel-heading text-center"><h4><span class="glyphicon glyphicon-list-alt"></span></h4></div>
+        	<div class="panel-heading text-center panel-headstyle"><h4><span class="glyphicon glyphicon-list-alt"></span></h4></div>
         	<div class="panel-body">
         		<p><strong>CNPJ: {{ person.asdict()['sic'] }}</strong></p>
 						<p><strong>TYPE: </strong>{{ person.asdict()['code'] }}</p>
@@ -79,7 +79,7 @@
 		{% if assets != [] %}
 	  <div class="row">
 	    <div class="panel panel-default">
-	      <div class="panel-heading text-center"><h4><span class="glyphicon glyphicon-home"></span></h4></div>
+	      <div class="panel-heading text-center panel-headstyle"><h4><span class="glyphicon glyphicon-home"></span></h4></div>
 	      <div class="panel-body">
 					<table id="people" class="display table table-striped table-hover table-condensed">
 						<thead>

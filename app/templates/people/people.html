@@ -31,9 +31,11 @@
 {% endblock %}
 
 {% block app_content %}
-{% if current_user.is_authenticated %}
+
 <div class="container">
 	<div class="well text-center"><h4>Persons Entries</h4></div>
+
+	{% if current_user.is_authenticated %}
 	<div class="row">
 		<div class="col-sm-3">
 			<a href="{{ url_for('people.add_person') }}">
@@ -65,9 +67,9 @@
 			</div>
 		</div>
 	</div>
-</div>
 <br>
 {% endif %}
+</div>
 {% if people != [] %}
 <div class="container">
 	<table id="people" class="display table table-striped table-hover table-condensed">

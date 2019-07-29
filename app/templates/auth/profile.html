@@ -9,13 +9,13 @@
 			</div>
 			<div class="row">
 				<img src="{{ url_for('static', filename='avatar.png') }}" style="text-align: center" class="image-responsive">
-				<p>{{ user.email }}</p> 
+				<p>{{ user.email }}</p>
 			</div>
 		</div>
 	</div>
 	<div class="col-sm-8">
 		<div class="panel panel-default">
-			<div class="panel-heading text-center"><h2>{{ user.username }}'s Files: </h2></div>
+			<div class="panel-heading text-center panel-headstyle"><h2>{{ user.username }}'s Files: </h2></div>
 			<div class="panel-body">
 				{% for file in user.files %}
 				{% include 'auth/_file.html' %}
