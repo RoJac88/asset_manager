@@ -13,6 +13,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
+    avatar = db.Column(db.Integer, default=0)
     password_hash = db.Column(db.String(128))
     persons = db.relationship('Person', backref='creator', lazy='dynamic', foreign_keys='Person.user_id')
     files = db.relationship('UserFile', backref='owner', lazy='select', foreign_keys='UserFile.user_id')

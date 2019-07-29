@@ -18,24 +18,38 @@ body {
   background-image: url("{{ url_for('static', filename='bg.png') }}");
   background-repeat: repeat;
   }
-.well {
-  background-image: linear-gradient(#fafafa, #d6d6d6);
-}
 .panel-headstyle {
   background-image: linear-gradient(#fafafa, #d6d6d6);
 }
 .panel-footer {
   background-image: linear-gradient(#fafafa, #d6d6d6);
 }
+.logo {
+  padding-top: 3px;
+  offset-right: 10px;
+}
 .nav-glyph {
   font-size: 26px;
   padding-left: 32px;
+  padding-top: 3px;
 }
 .nav-text {
   font-size: 18px;
   padding-top: 5px;
 }
-
+.well {
+  background-image: linear-gradient(#fafafa, #d6d6d6);
+}
+.well-black {
+  background-image: linear-gradient(#333333, #d6d6d6);
+}
+.well-transparent {
+  background-image: url("{{ url_for('static', filename='bg.png') }}");
+  background-repeat: repeat;
+}
+.profile-username {
+  font-size: x-large;
+}
 </style>
 {% endblock %}
 
@@ -50,7 +64,7 @@ body {
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-left" href="{{ url_for('main.index') }}"><img src="{{ url_for('static', filename='logo.png') }}"></a>
+                <a class="navbar-left" href="{{ url_for('main.index') }}"><img src="{{ url_for('static', filename='logo.png') }}" class="logo"></a>
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">

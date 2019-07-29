@@ -1,9 +1,9 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, current_app
 from werkzeug.urls import url_parse
 from flask_login import current_user, login_user, logout_user, login_required
 from app import db
 from app.auth import bp
-from app.auth.forms import LoginForm, RegistrationForm
+from app.auth.forms import LoginForm, RegistrationForm, EditUserForm
 from app.models import User
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -30,19 +30,31 @@ def logout():
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
+    avatars = current_app.config['AVATARS']
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
+        user.avatar = form.avatar.data
+        print(user.avatar)
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user!', 'success')
         return redirect(url_for('auth.login'))
-    return render_template('auth/register.html', form=form)
+    return render_template('auth/register.html', form=form, avatars=avatars)
 
+@bp.route('/profile', methods=['GET', 'POST'])
 @login_required
-@bp.route('/profile', methods=['GET'])
 def profile():
-    return render_template('auth/profile.html', user=current_user)
+    form = EditUserForm()
+    avatars = current_app.config['AVATARS']
+    if form.validate_on_submit():
+        current_user.email = form.email.data
+        current_user.avatar = form.avatar.data
+        db.session.commit()
+        flash('Your changes have been saved', 'success')
+        return redirect(url_for('auth.profile'))
+    return render_template('auth/profile.html', user=current_user,
+        avatars=avatars, form=form)

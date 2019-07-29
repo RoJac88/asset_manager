@@ -1,0 +1,9 @@
+{% if avatar == active %}
+<div class="item active" id="{{ avatar }}">
+  <img src="{{ url_for('static', filename=avatars[avatar]) }}" style="margin: auto;">
+</div>
+{% else %}
+<div class="item" id="{{ avatar }}">
+  <img src="{{ url_for('static', filename=avatars[avatar]) }}" style="margin: auto;">
+</div>
+{% endif %}

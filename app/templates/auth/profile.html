@@ -1,21 +1,34 @@
 {% extends "base.html " %}
 
+{% block scripts %}
+	{{ super() }}
+	<script>
+	$(document).ready(function() {
+    $('#myCarousel').bind('slid.bs.carousel', function () {
+      var avatar = $(".item.active").attr('id');
+      $('#avatar').val(avatar)
+    });
+  });
+	</script>
+{% endblock %}
+
 {% block app_content %}
+{% set avatar = avatars[user.avatar] %}
 <div class="container">
-	<div class="col-sm-4">
-		<div class=" well well-lg text-center">
-			<div class="well" style="background-image:url({{ url_for('static', filename='bg.png') }});">
-				<h2>{{  user.username }}</h2>
+	<div class="col-sm-3">
+		<div class="well-black well well-lg text-center">
+			<div class="well well-transparent">
+				<span class="profile-username">{{  user.username }}</span>
 			</div>
-			<div class="row">
-				<img src="{{ url_for('static', filename='avatar.png') }}" style="text-align: center" class="image-responsive">
-				<p>{{ user.email }}</p>
-			</div>
+			<img src="{{ url_for('static', filename=avatar) }}" style="text-align: center" class="image-responsive">
+			<h4><span class="label label-default">{{ user.email }}</span></h4>
+			<br>
+			<button type="button" class="btn btn-warning btn-xs pull-right" data-toggle="modal" data-target="#edit_user"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
 		</div>
 	</div>
-	<div class="col-sm-8">
+	<div class="col-sm-9">
 		<div class="panel panel-default">
-			<div class="panel-heading text-center panel-headstyle"><h2>{{ user.username }}'s Files: </h2></div>
+			<div class="panel-heading text-center panel-headstyle"><h3>{{ user.username }}'s Files: </h3></div>
 			<div class="panel-body">
 				{% for file in user.files %}
 				{% include 'auth/_file.html' %}
@@ -24,4 +37,60 @@
 		</div>
 	</div>
 </div>
+
+<div id="edit_user" class="modal fade" role="dialog">
+	<form method="post" action="" role="form" enctype="multipart/form-data">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close btn btn-danger" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Update User Info</h4>
+				</div>
+				<div class="modal-body">
+
+					<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
+		        {% set active = user.avatar %} <!-- Default active avatar -->
+		        <!-- Wrapper for slides -->
+		        <div class="carousel-inner">
+		          {% for avatar in avatars %}
+		          {% include 'auth/_avatar_item.html'%}
+		          {% endfor %}
+		        </div>
+		        <!-- Left and right controls -->
+		        <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+		          <span class="glyphicon glyphicon-chevron-left"></span>
+		          <span class="sr-only">Previous</span>
+		        </a>
+		        <a class="right carousel-control" href="#myCarousel" data-slide="next">
+		          <span class="glyphicon glyphicon-chevron-right"></span>
+		          <span class="sr-only">Next</span>
+		        </a>
+		      </div>
+
+					<fieldset class="user">
+						<div class="hidden">
+		          {{ form.csrf_token }}
+		          {{ form.avatar.label(class="control-label") }}
+		          {{ form.avatar(class="form-control", id="avatar") }}
+		        </div>
+						<div class="form-group">
+							{{ form.email.label(class="control-label") }}
+							{{ form.email(class="form-control", value=user.email) }}
+							{% for error in form.email.errors %}
+							<span class="help-block">{{ error }}</span>
+							{% endfor %}
+						</div>
+					</fieldset>
+				</div>
+				<div class="modal-footer">
+					<div class="form-group">
+						{{ form.submit.label(class="sr-only") }}
+						{{ form.submit(class="form-control btn-success") }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
 {% endblock %}
