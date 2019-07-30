@@ -3,5 +3,5 @@
 	<td>{{ person.type.upper() }}</td>
 	<td>{{ person.name }}{{person.legal_name}}</td>
 	<td>{{ person.asdict()['sic'] }}</td>
-	<td><a href="{{ url_for('people.person', person_id=person.id) }}"><button type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-info-sign"></span> Info</button></a></td>
+	<td><a href="{{ url_for('people.person', person_id=person.id) }}"><button type="button" class="btn btn-primary btn-xs pull-right"><span class="glyphicon glyphicon-info-sign"></span> Info</button></a></td>
 </tr>
