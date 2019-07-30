@@ -3,13 +3,7 @@
 
 {% block scripts %}
 	{{ super() }}
-	<script>
-	$(document).ready(function() {
-    $('#imoveis').DataTable( {
-			"pagingType": "full_numbers"
-		} );
-	} );
-	</script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/realestate.js') }}"></script>
 {% endblock %}
 
 {% block head %}

@@ -2,13 +2,7 @@
 
 {% block scripts %}
 	{{ super() }}
-	<script>
-	$(document).ready(function() {
-    $('#people').DataTable( {
-			"pagingType": "full_numbers"
-		} );
-	} );
-	</script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/people.js') }}"></script>
 {% endblock %}
 
 {% block head %}
