@@ -94,14 +94,14 @@
 		{% endif %}
 		<div class="row">
 			<div class="well">
-				<p>Last modification: {{ moment(person.last_edit_time).fromNow() }}, by: <strong>{{ person.editor }}</strong>
+				<p>Last modification: {{ moment(person.last_edit_time).fromNow() }}, by: <span class="label label-success">{{ person.editor }}</span>
           {% if current_user.is_authenticated %}
           <a href="{{ url_for('people.delete_person', person_id=person.id) }}"
             <button type="button" class="btn btn-lg btn-danger pull-right"><span class="glyphicon glyphicon-trash"></span></button>
           </a>
           {% endif %}
         </p>
-				<p>Created: {{ moment(person.timestamp).format('LLLL') }}, by: <strong>{{ person.creator }}</strong></p>
+				<p>Created: {{ moment(person.timestamp).format('LLLL') }}, by: <span class="label label-success">{{ person.creator }}</span></p>
 			</div>
 		</div>
 	</div>

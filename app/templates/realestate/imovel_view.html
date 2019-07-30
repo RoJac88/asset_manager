@@ -251,14 +251,14 @@
   </div>
   <div class="row">
     <div class="well">
-      <p>Last modification: {{ moment(imovel.last_edit_time).fromNow() }}, by: <strong>{{ imovel.editor }}</strong>
+      <p>Last modification: {{ moment(imovel.last_edit_time).fromNow() }}, by: <span class="label label-success">{{ imovel.editor }}</span>
         {% if current_user.is_authenticated %}
         <a href="{{ url_for('realestate.delete_imovel', imovel_id=imovel.id) }}"
           <button type="button" class="btn btn-lg btn-danger pull-right"><span class="glyphicon glyphicon-trash"></span></button>
         </a>
         {% endif %}
       </p>
-      <p>Created: {{ moment(imovel.timestamp).format('LLLL') }}, by: <strong>{{ imovel.creator }}</strong></p>
+      <p>Created: {{ moment(imovel.timestamp).format('LLLL') }}, by: <span class="label label-success">{{ imovel.creator }}</span></p>
     </div>
   </div>
 </div>
