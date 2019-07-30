@@ -4,7 +4,7 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms import StringField, SubmitField, BooleanField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import ValidationError, DataRequired, Optional, Email
-from app.models import NaturalPerson, LegalPCodes, Cep
+from app.models import NaturalPerson, LegalPCodes, Cep, LegalPerson
 from app.people.helpers import cnpj_isvalid, cpf_isvalid
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from datetime import datetime
