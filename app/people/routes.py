@@ -34,7 +34,7 @@ def _get_person():
 def add_person():
     form1 = AddNaturalPersonForm()
     form2 = AddLegalPersonFrom()
-    if form1.validate_on_submit() and form1.submit.data:
+    if form1.submit.data and form1.validate_on_submit():
         new_person = NaturalPerson()
         new_person.user_id = current_user.id
         new_person.last_editor = current_user.id
@@ -53,7 +53,7 @@ def add_person():
         db.session.commit()
         flash('Added {} to the database!'.format(new_person.name), 'success')
         return redirect(url_for('main.index'))
-    if form2.validate_on_submit() and form2.submit.data:
+    if form2.submit.data and form2.validate_on_submit():
         new_person = LegalPerson()
         new_person.user_id = current_user.id
         new_person.last_editor = current_user.id
@@ -68,6 +68,10 @@ def add_person():
         new_person.addr_rua = form2.addr_rua.data
         new_person.addr_num = form2.addr_num.data
         new_person.addr_compl = form2.addr_compl.data
+        if form2.legal_birth.data:
+            new_person.legal_birth = form2.legal_birth.data
+        if form2.legal_death.data:
+            new_person.legal_death = form2.legal_death.data
         db.session.add(new_person)
         db.session.commit()
         flash('Added {} to the database!'.format(new_person.legal_name), 'info')
@@ -129,7 +133,7 @@ def person():
         if form.legal_birth.data:
             current_person.legal_birth = form.legal_birth.data
         if form.legal_death.data:
-            current_person.legal_death =form.legal_death.data
+            current_person.legal_death = form.legal_death.data
         current_person.legal_status = form.legal_status.data
         current_person.last_editor = current_user.id
         current_person.last_edit_time = datetime.utcnow()

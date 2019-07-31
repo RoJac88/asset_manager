@@ -1,7 +1,7 @@
 from sqlalchemy.orm import backref
 from sqlalchemy.ext.associationproxy import association_proxy
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, date
 from app import db, login
 from flask_login import UserMixin
 
@@ -138,8 +138,8 @@ class LegalPerson(Person):
     legal_name = db.Column(db.String(64))
     cnpj = db.Column(db.String(20), index=True, unique=True)
     code = db.Column(db.Integer, db.ForeignKey('legal_codes.id'))
-    legal_birth = db.Column(db.DateTime, index=True, default=datetime(1889,11,15))
-    legal_death = db.Column(db.DateTime)
+    legal_birth = db.Column(db.Date, index=True, default=date(1889,11,15))
+    legal_death = db.Column(db.Date)
     legal_status = db.Column(db.String(22))
 
     def __repr__(self):

@@ -44,9 +44,9 @@
         		<p><strong>CNPJ: {{ person.asdict()['sic'] }}</strong></p>
 						<p><strong>TYPE: </strong>{{ person.asdict()['code'] }}</p>
 						<p><strong>STATUS: </strong>{{ person.legal_status }}</p>
-            <p><strong>LEGAL BIRTH: </strong>{{ moment(person.legal_birth).format('LL') }}</p>
+            <p><strong>LEGAL BIRTH: </strong>{{ moment(person.legal_birth, local=true).format('LL') }}</p>
 						{% if person.legal_death %}
-            <p><strong>LEGAL DEATH: </strong>{{ moment(person.legal_death).format('LL') }}</p>
+            <p><strong>LEGAL DEATH: </strong>{{ moment(person.legal_death, local=true).format('LL') }}</p>
 						{% endif %}
           </div>
           {% if current_user.is_authenticated %}
