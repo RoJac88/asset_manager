@@ -216,7 +216,7 @@ class Imovel(db.Model):
     addr_compl = db.Column(db.String(64))
     matricula_n = db.Column(db.String(6))
     matricula_file = db.Column(db.String(128))
-    matricula_file_date = db.Column(db.DateTime, index=True, default=datetime(1889,11,15))
+    matricula_file_date = db.Column(db.Date, index=True)
     total_shares = db.Column(db.Integer)
     files = db.relationship('ImovelFile', backref='imovel', lazy='select', foreign_keys='ImovelFile.imovel_id')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
