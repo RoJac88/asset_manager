@@ -46,7 +46,6 @@ def imovel():
         for ownership in ownerships:
             db.session.delete(ownership)
         for data in owners_form.owners.data:
-            print(data)
             n = data['owner']
             if n:
                 if len(n) == 11:
@@ -110,8 +109,6 @@ def imovel():
         return redirect(url_for('realestate.imovel', imovel_id=imovel.id, owners=owners,
             unknown_shares=unknown_shares, contact_form=contact_form, owners_form=owners_form,
             fields=range(len(owners)), mat_form=mat_form))
-    print(owners)
-    print(owners_form.owners)
     return render_template('realestate/imovel_view.html', imovel=imovel, owners=owners,
         unknown_shares=unknown_shares, contact_form=contact_form, owners_form=owners_form,
         fields=range(len(owners)), mat_form=mat_form)
@@ -171,3 +168,22 @@ def delete_imovel():
         db.session.commit()
         flash('Record deleted: {}'.format(imovel), 'success')
         return redirect(url_for('realestate.realestate'))
+
+@bp.route('/imovel/delete_owners', methods=['GET'])
+@login_required
+def delete_owners():
+    imovel_id = request.args.get('imovel_id')
+    imovel = Imovel.query.get(imovel_id)
+    if not imovel:
+        flash('No such record', 'danger')
+        return redirect(url_for('realestate.realestate'))
+    else:
+        ownerships = PersonImovel.query.filter_by(imovel_id=imovel.id).all()
+        if ownerships:
+            for own in ownerships:
+                db.session.delete(own)
+        imovel.last_edit_time = datetime.utcnow()
+        imovel.last_editor = current_user.id
+        db.session.commit()
+        flash('Reset Owners for {}'.format(imovel.name), 'success')
+        return redirect(url_for('realestate.imovel', imovel_id=imovel.id))

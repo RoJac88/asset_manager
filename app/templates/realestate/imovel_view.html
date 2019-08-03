@@ -62,6 +62,9 @@
         {% if current_user.is_authenticated %}
         <div class="panel-footer">
           <button type="button" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#edit_owners"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+          {% if unknown_shares != imovel.total_shares %}
+          <a href="{{ url_for('realestate.delete_owners', imovel_id=imovel.id) }}"><button type="button" class="btn btn-danger btn-xs pull-right"><span class="glyphicon glyphicon-trash"></span> Delete Owners</button></a>
+          {% endif %}
         </div>
         {% endif %}
       </div>
