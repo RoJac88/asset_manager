@@ -83,31 +83,6 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-6">
-          <fieldset id ="estate_owners">
-            <legend>Owners <button type="button" class="btn btn-primary btn-sm pull-right" id="add_own"><span class="glyphicon glyphicon-plus"></span> Add Owner</button></legend>
-            {% for l in form.owners %}
-            <div class ="form-group form-inline owner_form">
-              {{ l.owner.label(class_='owner_id_label form-control') }}
-              {{ l.owner(class_='form-control') }}
-              {{ l.share.label(class_='owner_share_label form-control') }}
-              {{ l.share(class_='form-control') }}
-            </div>
-            {% endfor %}
-          </fieldset>
-        </div>
-        <div class="col-xs-6">
-          <fieldset id ="owners_info">
-            <legend>Info</legend>
-            {% for info_field in fields %}
-              <div class ="form-group owner-info-{{ info_field }}">
-                <input id="info-{{ info_field }}" class="form-control owner-info" type="text" value="" style="height:39px" disabled>
-              </div>
-            {% endfor %}
-          </fieldset>
-        </div>
-      </div>
-      <div class="row">
         <div class="form-group">
           {{ form.submit.label(class="sr-only") }}
           {{ form.submit(class="form-control btn-success") }}

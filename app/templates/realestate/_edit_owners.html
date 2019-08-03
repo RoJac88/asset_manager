@@ -20,39 +20,56 @@
           <div class="col-xs-7">
             <fieldset id ="estate_owners">
               <legend>Owners <button type="button" class="btn btn-primary btn-sm pull-right" id="add_own"><span class="glyphicon glyphicon-plus"></span> Add Owner</button></legend>
-              {% for l in owners_form.owners %}
-              <div class ="form-group form-inline owner_form">
-                {% set person =  owners[loop.index0][0] %}
-                {% if person.type == 'legal' %}
-                  {% set own = person.cnpj %}
-                {% else %}
-                  {% set own = person.cpf %}
-                {% endif %}
-                {% set shares = owners[loop.index0][1] %}
-                {{ l.owner.label(class_='owner_id_label form-control') }}
-                {{ l.owner(class_='form-control', value=own) }}
-                {{ l.share.label(class_='owner_share_label form-control') }}
-                {{ l.share(class_='form-control', value=shares) }}
-                {% if loop.index0 != 0 %}
-                <button type="button" class="btn btn-danger btn-sm form-control" id="{{ loop.index0 }}"><span class="glyphicon glyphicon-trash"></span></button>
-                {% endif %}
-              </div>
-              {% endfor %}
+              {% if owners == [] %}
+                <div class ="form-group form-inline owner_form">
+                  {% for l in owners_form.owners %}
+                  {{ l.owner.label(class_='owner_id_label form-control') }}
+                  {{ l.owner(class_='form-control') }}
+                  {{ l.share.label(class_='owner_share_label form-control') }}
+                  {{ l.share(class_='form-control') }}
+                  {% endfor %}
+                </div>
+              {% else %}
+                {% for l in owners_form.owners %}
+                <div class ="form-group form-inline owner_form">
+                  {% set person =  owners[loop.index0][0] %}
+                  {% if person.type == 'legal' %}
+                    {% set own = person.cnpj %}
+                  {% else %}
+                    {% set own = person.cpf %}
+                  {% endif %}
+                  {% set shares = owners[loop.index0][1] %}
+                  {{ l.owner.label(class_='owner_id_label form-control') }}
+                  {{ l.owner(class_='form-control', value=own) }}
+                  {{ l.share.label(class_='owner_share_label form-control') }}
+                  {{ l.share(class_='form-control', value=shares) }}
+                  {% if loop.index0 != 0 %}
+                  <button type="button" class="btn btn-danger btn-sm form-control" id="{{ loop.index0 }}"><span class="glyphicon glyphicon-trash"></span></button>
+                  {% endif %}
+                </div>
+                {% endfor %}
+              {% endif %}
             </fieldset>
           </div>
           <div class="col-xs-5">
             <fieldset id ="owners_info">
               <legend>Info</legend>
-              {% for l in owners_form.owners %}
-                {% set person =  owners[loop.index0][0] %}
-                {% set name = person.name %}
-                {% if person.type == 'legal' %}
-                  {% set name = person.legal_name %}
-                {% endif %}
-                <div class ="form-group owner-info-{{ loop.index0 }}">
-                  <input id="info-{{ loop.index0 }}" class="form-control owner-info" type="text" value="{{ name }}" style="height:39px" disabled>
+              {% if owners == [] %}
+                <div class ="form-group owner-info-0">
+                  <input id="info-0" class="form-control owner-info" type="text" value="" style="height:39px" disabled>
                 </div>
-              {% endfor %}
+              {% else %}
+                {% for l in owners_form.owners %}
+                  {% set person =  owners[loop.index0][0] %}
+                  {% set name = person.name %}
+                  {% if person.type == 'legal' %}
+                    {% set name = person.legal_name %}
+                  {% endif %}
+                  <div class ="form-group owner-info-{{ loop.index0 }}">
+                    <input id="info-{{ loop.index0 }}" class="form-control owner-info" type="text" value="{{ name }}" style="height:39px" disabled>
+                  </div>
+                {% endfor %}
+              {% endif %}
             </fieldset>
           </div>
         </div>

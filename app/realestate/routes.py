@@ -9,15 +9,6 @@ from app.models import Imovel, Cep, PersonImovel, NaturalPerson, LegalPerson, Pe
 from datetime import datetime
 from app.realestate import bp
 
-def info_fields(im_dict):
-    fields = []
-    for key in im_dict.keys():
-        _txt = key.split('-')
-        if 'owner' in _txt and 'owners' in _txt:
-            fields.append(_txt[1])
-    if fields == []: return [0]
-    else: return fields
-
 @bp.route('/cep')
 @login_required
 def cep():
@@ -41,6 +32,8 @@ def realestate():
 def imovel():
     imovel_id = request.args.get('imovel_id')
     imovel = Imovel.query.get(imovel_id)
+    if imovel == None:
+        return render_template('realestate/imovel_view.html', imovel=None)
     contact_form = EditContactForm()
     owners_form = EditOwnersForm()
     mat_form = MatriculaUpdateForm()
@@ -80,8 +73,9 @@ def imovel():
         if index > 0: owners_form.owners.append_entry()
         owners.append((owner, shares))
     unknown_shares = imovel.total_shares - known_shares
-    while len(list(owners_form.owners)) > len(owners):
-        owners_form.owners.pop_entry()
+    if len(list(ownerships)) > 0:
+        while len(list(owners_form.owners)) > len(owners):
+            owners_form.owners.pop_entry()
     if current_user.is_authenticated and mat_form.submit_mat.data and mat_form.validate_on_submit():
         target = current_app.config['RE_FILES_FOLDER']
         file = mat_form.matricula_file.data
@@ -116,6 +110,8 @@ def imovel():
         return redirect(url_for('realestate.imovel', imovel_id=imovel.id, owners=owners,
             unknown_shares=unknown_shares, contact_form=contact_form, owners_form=owners_form,
             fields=range(len(owners)), mat_form=mat_form))
+    print(owners)
+    print(owners_form.owners)
     return render_template('realestate/imovel_view.html', imovel=imovel, owners=owners,
         unknown_shares=unknown_shares, contact_form=contact_form, owners_form=owners_form,
         fields=range(len(owners)), mat_form=mat_form)
@@ -124,7 +120,6 @@ def imovel():
 @login_required
 def add_realestate():
     form = ImovelForm()
-    fields = info_fields(request.form)
     target = current_app.config['RE_FILES_FOLDER']
     if form.validate_on_submit() and form.submit.data:
         if not os.path.exists(target): os.makedirs(target)
@@ -151,20 +146,11 @@ def add_realestate():
         new_realestate.user_id = current_user.id
         new_realestate.last_editor = current_user.id
         db.session.add(new_realestate)
-        for data in form.owners.data:
-            n = data['owner']
-            if len(n) == 11:
-                owner = NaturalPerson.query.filter_by(cpf=n).first()
-            if len(n) == 14:
-                owner = LegalPerson.query.filter_by(cnpj=n).first()
-            share = data['share']
-            person_has_estate = PersonImovel(person=owner, estate=new_realestate, shares=share)
-            db.session.add(person_has_estate)
         db.session.commit()
         flash('Added {} to the database!'.format(new_realestate.name), 'success')
         return redirect(url_for('realestate.realestate'))
     if form.errors: print(form.errors)
-    return render_template('realestate/add_realestate.html', form=form, fields=fields)
+    return render_template('realestate/add_realestate.html', form=form)
 
 @bp.route('/imovel/<imovel_id>/delete', methods=['GET'])
 @login_required

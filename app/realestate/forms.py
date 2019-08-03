@@ -108,8 +108,7 @@ class ImovelForm(FlaskForm):
         FileAllowed(['pdf'], 'PDF flies only')
     ])
     matricula_file_date = DateField('Matrícula PDF Date', validators=[Optional()])
-    owners = FieldList(FormField(OwnImovelForm), min_entries=1, validators=[validate_owners])
-    total_shares = IntegerField('Total Shares', validators=[validate_total_shares])
+    total_shares = IntegerField('Total Shares')
     submit = SubmitField('Insert')
 
     def validate_addr_cep(self, addr_cep):
