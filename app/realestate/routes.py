@@ -152,9 +152,10 @@ def add_realestate():
     if form.errors: print(form.errors)
     return render_template('realestate/add_realestate.html', form=form)
 
-@bp.route('/imovel/<imovel_id>/delete', methods=['GET'])
+@bp.route('/imovel/delete', methods=['GET'])
 @login_required
-def delete_imovel(imovel_id):
+def delete_imovel():
+    imovel_id = request.args.get('imovel_id')
     imovel = Imovel.query.get(imovel_id)
     if not imovel:
         flash('Cannot delete non existent record', 'danger')
