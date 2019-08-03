@@ -98,6 +98,9 @@ def person():
         return render_template('people/natural_person_view.html', person=None,
             form=None, assets=None, contact_form=None)
     current_person = Person.query.get(person_id)
+    if not current_person:
+        return render_template('people/natural_person_view.html', person=None,
+            form=None, assets=None, contact_form=None)
     form = None
     contact_form = EditContactForm()
     print(contact_form.errors)
