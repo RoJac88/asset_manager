@@ -116,7 +116,7 @@ def person():
         asset = Imovel.query.get(item.imovel_id)
         share = item.shares
         assets.append((asset, share))
-    if contact_form.validate_on_submit():
+    if contact_form.submit.data and contact_form.validate_on_submit():
         current_person.email = contact_form.email.data
         current_person.addr_cep = contact_form.addr_cep.data
         current_person.addr_city = contact_form.addr_city.data
@@ -130,7 +130,7 @@ def person():
         db.session.commit()
         flash('Contact details updated', 'success')
         return redirect(url_for('people.person', person_id=current_person.id))
-    if form.validate_on_submit() and current_person.type == 'legal':
+    if form.submit_details.data and form.validate_on_submit() and current_person.type == 'legal':
         current_person.legal_name = form.legal_name.data.upper()
         current_person.code = form.code.data.id
         if form.legal_birth.data:
@@ -143,7 +143,7 @@ def person():
         db.session.commit()
         flash('Legal person details updated', 'success')
         return redirect(url_for('people.person', person_id=current_person.id))
-    if form.validate_on_submit() and current_person.type == 'natural':
+    if form.submit_details.data and form.validate_on_submit() and current_person.type == 'natural':
         current_person.name = form.name.data.upper()
         current_person.rg = form.rg.data
         current_person.last_editor = current_user.id

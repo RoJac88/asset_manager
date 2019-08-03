@@ -65,7 +65,7 @@ class EditContactForm(FlaskForm):
 class EditNaturalPersonForm(FlaskForm):
     name = StringField('Name')
     rg = StringField('RG', validators=[Optional(), validate_rg])
-    submit = SubmitField('Update')
+    submit_details = SubmitField('Update')
 
 
 class EditLegalPersonForm(FlaskForm):
@@ -75,7 +75,7 @@ class EditLegalPersonForm(FlaskForm):
     legal_birth = DateField(validators=[Optional()])
     legal_death = DateField(validators=[Optional()])
     legal_status = StringField(validators=[Optional()])
-    submit = SubmitField('Update')
+    submit_details = SubmitField('Update')
 
 
 class AddLegalPersonFrom(FlaskForm):
