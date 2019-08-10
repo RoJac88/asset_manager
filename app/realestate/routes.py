@@ -65,7 +65,6 @@ def imovel():
             unknown_shares=unknown_shares, contact_form=contact_form, owners_form=owners_form,
             fields=range(len(owners)), mat_form=mat_form))
     for index, item in enumerate(ownerships):
-        line = OwnImovelForm()
         owner = Person.query.get(item.person_id)
         shares = item.shares
         known_shares += shares

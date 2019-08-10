@@ -1,3 +1,14 @@
-<tr>
-  <td>{{ field.label }}</td>
-</tr>
+<div class="row" style="padding-bottom: 4px;">
+  <div class="col-xs-2">
+    <input type="text" class="form-control" id="field-" value="{{ field.index }}" disabled>
+  </div>
+  <div class="col-xs-4">
+    <input type="text" class="form-control" id="field-" value="{{ field.label }}" disabled>
+  </div>
+  <div class="col-xs-3">
+    <input type="text" class="form-control" id="class-" value="{{ field.target_class }}" disabled>
+  </div>
+  <div class="col-xs-3">
+    <input type="text" class="form-control" id="attr-" value="{{ field.target_attr }}" disabled>
+  </div>
+</div>
