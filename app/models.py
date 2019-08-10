@@ -126,6 +126,7 @@ class NaturalPerson(Person):
             'addr_cep': self.addr_cep,
             'addr_city': self.addr_city,
             'addr_uf': self.addr_uf,
+            'addr_compl': self.addr_compl,
             }
 
     @staticmethod
@@ -151,13 +152,14 @@ class LegalPerson(Person):
 
     @staticmethod
     def csv_editable():
-        return {'legal_name', 'cnpj', 'code', 'email', 'addr_bairro', 'addr_rua', 'legal_status',
+        return {'name', 'legal_name', 'cnpj', 'code', 'email', 'addr_bairro', 'addr_rua', 'legal_status',
             'addr_num', 'addr_cep', 'addr_city', 'addr_uf', 'legal_birth', 'legal_death'}
 
     def asdict(self):
         mycode = LegalPCodes.query.get(self.code)
         return {
             'name': self.legal_name,
+            'legal_name': self.legal_name,
             'cnpj': self.cnpj[:2]+'.'+self.cnpj[2:5]+'.'+self.cnpj[5:8]+'/'+self.cnpj[8:12]+'-'+self.cnpj[12:],
             'sic': self.cnpj[:2]+'.'+self.cnpj[2:5]+'.'+self.cnpj[5:8]+'/'+self.cnpj[8:12]+'-'+self.cnpj[12:],
             'code': str(mycode),
@@ -168,6 +170,7 @@ class LegalPerson(Person):
             'addr_cep': self.addr_cep,
             'addr_city': self.addr_city,
             'addr_uf': self.addr_uf,
+            'addr_compl': self.addr_compl,
             'legal_birth': str(self.legal_birth),
             'legal_death': str(self.legal_death),
             'legal_status': self.legal_status,
@@ -196,12 +199,16 @@ class TemplateDocx(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     latest_use = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    docs_generated = db.Column(db.Integer)
+    targets = db.Column(db.String(256), default=None)
+    docs_generated = db.Column(db.Integer, default=0)
 
 class MergeField(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     label = db.Column(db.String(24))
     template = db.Column(db.Integer, db.ForeignKey('template_docx.id'))
+    target_class = db.Column(db.String(24))
+    target_attr = db.Column(db.String(24))
+    index = db.Column(db.Integer, default=0)
 
 class Imovel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -223,6 +230,27 @@ class Imovel(db.Model):
     last_editor = db.Column(db.Integer, db.ForeignKey('user.id'))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     last_edit_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
+    @staticmethod
+    def csv_editable():
+        return {'name', 'matricula_n', 'total_shares', 'matricula_file_date', 'addr_bairro', 'addr_rua',
+            'addr_num', 'addr_cep', 'addr_city', 'addr_uf', 'addr_compl',}
+
+    def asdict(self):
+        return {
+            'name': self.name,
+            'SQL': self.sql,
+            'matricula_n': self.matricula_n,
+            'matricula_file_date': self.matricula_file_date,
+            'total_shares': self.total_shares,
+            'addr_bairro': self.addr_bairro,
+            'addr_rua': self.addr_rua,
+            'addr_num': self.addr_num,
+            'addr_cep': self.addr_cep,
+            'addr_cidade': self.addr_cidade,
+            'addr_uf': self.addr_uf,
+            'addr_compl': self.addr_compl,
+            }
 
 class Cep(db.Model):
     id = db.Column(db.String(8), primary_key=True)
