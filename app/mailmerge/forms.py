@@ -6,6 +6,7 @@ from wtforms.validators import ValidationError, DataRequired, Optional
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from app.models import NaturalPerson, LegalPerson, MergeField
 
+
 class AddDocx(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     description = StringField('Description', validators=[Optional()])
