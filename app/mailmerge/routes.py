@@ -122,7 +122,7 @@ def template():
             elif targets[target] == 'Imovel':
                 setattr(MergeForm, target,
                     formfield('Imovel-'+str(target), query_factory=lambda: Imovel.query.all(), allow_blank=False))
-        MergeForm.submit_merge = SubmitField('Merge')
+    MergeForm.submit_merge = SubmitField('Merge')
     merge_form = MergeForm()
     if merge_form.submit_merge.data and merge_form.validate_on_submit():
         names = []
