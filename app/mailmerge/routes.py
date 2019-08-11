@@ -37,7 +37,7 @@ def mailmerge():
 @login_required
 def add_template():
     form = AddDocx()
-    target = current_app.config['TEMPLATES_FOLDER']
+    target = current_app.config['MERGE_TEMPLATES_FOLDER']
     if not os.path.exists(target): os.makedirs(target)
     if form.validate_on_submit():
         file = form.file.data
