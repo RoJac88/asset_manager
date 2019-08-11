@@ -213,7 +213,7 @@ class MergeField(db.Model):
 class Imovel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(24))
-    sql = db.Column(db.String(9), index=True)
+    sql = db.Column(db.String(11), index=True)
     addr_cep = db.Column(db.String(8), db.ForeignKey('cep.id'))
     addr_cidade = db.Column(db.String(24))
     addr_uf = db.Column(db.String(2))

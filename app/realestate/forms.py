@@ -94,7 +94,7 @@ class MatriculaUpdateForm(FlaskForm):
 
 class ImovelForm(FlaskForm):
     name = StringField('Name')
-    sql = StringField('SQL', validators=[Optional()], render_kw={'maxlength': 9})
+    sql = StringField('SQL', validators=[Optional()], render_kw={'maxlength': 11})
     addr_cep = StringField('CEP', render_kw={'maxlength': 8})
     addr_cidade = StringField('Cidade')
     addr_uf = StringField('UF', render_kw={'maxlength': 2})
