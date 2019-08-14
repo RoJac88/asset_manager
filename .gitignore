@@ -1,5 +1,6 @@
 /logs/
 /migrations
+/venv
 app.db
 app/mailmerge/models
 app/mailmerge/output
@@ -7,3 +8,11 @@ app/realestate/files
 Pipfile
 Pipfile.lock
 .env
+
+/__pycache__
+app/__pycache__
+app/auth/__pycache__
+app/mailmerge/__pycache__
+app/main/__pycache__
+app/people/__pycache__
+app/realestate/__pycache__
