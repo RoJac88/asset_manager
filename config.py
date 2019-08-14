@@ -10,9 +10,7 @@ def get_avatars():
         for file in files:
             if file[-4:] == '.png':
                 avatars[index] = 'avatars/' + file
-                print('Avatar {} added: {}'.format(index, file))
                 index += 1
-    print(avatars)
     return avatars
 
 class Config(object):
