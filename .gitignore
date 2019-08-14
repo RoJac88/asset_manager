@@ -5,8 +5,6 @@ app.db
 app/mailmerge/models
 app/mailmerge/output
 app/realestate/files
-Pipfile
-Pipfile.lock
 .env
 
 /__pycache__
